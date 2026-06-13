@@ -112,7 +112,7 @@ PyTorch Geometric 2.5.3
 ## One-Shot Installation (Existing Environment)
 
 ```bash
-uv pip install torch==2.1.2 torch-geometric==2.5.3 rdkit==2026.3.2 torchdrug==0.2.1 deepchem==2.8.0
+uv pip install torch==2.1.2 && uv pip install torch-geometric==2.5.3 rdkit==2026.3.2 torchdrug==0.2.1 deepchem==2.8.0
 ```
 
 # SMILES vs SMARTS
