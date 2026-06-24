@@ -1,0 +1,242 @@
+[
+    {
+        "filename": "sample_0000.las",
+        "shape_type": "Asymmetric Heap",
+        "terrain_type": "Rough industrial floor",
+        "height_m": 0.9588,
+        "radius_m": 2.4014,
+        "rotation_z_rad": 0.9803,
+        "translation_xy": [
+            -0.344,
+            -0.4419
+        ],
+        "point_count": 251164,
+        "noise_level_m": 0.0098,
+        "volume_m3": 7.532336,
+        "sensor_position": [
+            -0.2331,
+            -0.9339,
+            2.2902
+        ],
+        "scan_resolution_deg": [
+            0.132,
+            0.24
+        ]
+    },
+    {
+        "filename": "sample_0001.las",
+        "shape_type": "Random Irregular Heap",
+        "terrain_type": "Rough industrial floor",
+        "height_m": 0.6561,
+        "radius_m": 1.4869,
+        "rotation_z_rad": 2.1143,
+        "translation_xy": [
+            0.1916,
+            -0.3887
+        ],
+        "point_count": 55806,
+        "noise_level_m": 0.0137,
+        "volume_m3": 1.460629,
+        "sensor_position": [
+            -1.9144,
+            0.6898,
+            2.6377
+        ],
+        "scan_resolution_deg": [
+            0.301,
+            0.35
+        ]
+    },
+    {
+        "filename": "sample_0002.las",
+        "shape_type": "Double Peak",
+        "terrain_type": "Uneven",
+        "height_m": 1.0518,
+        "radius_m": 1.8067,
+        "rotation_z_rad": 3.9753,
+        "translation_xy": [
+            -0.3237,
+            0.2864
+        ],
+        "point_count": 150133,
+        "noise_level_m": 0.0033,
+        "volume_m3": 3.604916,
+        "sensor_position": [
+            1.4085,
+            2.0344,
+            2.2836
+        ],
+        "scan_resolution_deg": [
+            0.231,
+            0.136
+        ]
+    },
+    {
+        "filename": "sample_0003.las",
+        "shape_type": "Gaussian",
+        "terrain_type": "Rough industrial floor",
+        "height_m": 1.0984,
+        "radius_m": 2.4196,
+        "rotation_z_rad": 5.0587,
+        "translation_xy": [
+            0.2114,
+            0.0398
+        ],
+        "point_count": 105904,
+        "noise_level_m": 0.0109,
+        "volume_m3": 6.462452,
+        "sensor_position": [
+            -2.5014,
+            -2.0585,
+            3.4006
+        ],
+        "scan_resolution_deg": [
+            0.26,
+            0.306
+        ]
+    },
+    {
+        "filename": "sample_0004.las",
+        "shape_type": "Triple Peak",
+        "terrain_type": "Flat",
+        "height_m": 0.8859,
+        "radius_m": 2.2486,
+        "rotation_z_rad": 4.9229,
+        "translation_xy": [
+            -0.0155,
+            -0.454
+        ],
+        "point_count": 164149,
+        "noise_level_m": 0.0051,
+        "volume_m3": 6.647239,
+        "sensor_position": [
+            -2.1241,
+            -2.4001,
+            3.2075
+        ],
+        "scan_resolution_deg": [
+            0.152,
+            0.288
+        ]
+    },
+    {
+        "filename": "sample_0005.las",
+        "shape_type": "Double Peak",
+        "terrain_type": "Uneven",
+        "height_m": 1.0467,
+        "radius_m": 0.5179,
+        "rotation_z_rad": 2.8907,
+        "translation_xy": [
+            -0.1066,
+            0.2886
+        ],
+        "point_count": 19754,
+        "noise_level_m": 0.0116,
+        "volume_m3": 0.294874,
+        "sensor_position": [
+            -0.451,
+            -0.2489,
+            4.0335
+        ],
+        "scan_resolution_deg": [
+            0.362,
+            0.182
+        ]
+    },
+    {
+        "filename": "sample_0006.las",
+        "shape_type": "Double Peak",
+        "terrain_type": "Sloped",
+        "height_m": 0.5212,
+        "radius_m": 2.1352,
+        "rotation_z_rad": 1.205,
+        "translation_xy": [
+            0.1671,
+            0.3077
+        ],
+        "point_count": 115370,
+        "noise_level_m": 0.0078,
+        "volume_m3": 2.495944,
+        "sensor_position": [
+            0.0501,
+            0.7672,
+            3.3064
+        ],
+        "scan_resolution_deg": [
+            0.305,
+            0.349
+        ]
+    },
+    {
+        "filename": "sample_0007.las",
+        "shape_type": "Truncated Cone",
+        "terrain_type": "Uneven",
+        "height_m": 1.0569,
+        "radius_m": 0.6499,
+        "rotation_z_rad": 4.2,
+        "translation_xy": [
+            -0.0055,
+            0.2243
+        ],
+        "point_count": 29358,
+        "noise_level_m": 0.0102,
+        "volume_m3": 0.454901,
+        "sensor_position": [
+            -0.1166,
+            0.8747,
+            4.4224
+        ],
+        "scan_resolution_deg": [
+            0.151,
+            0.322
+        ]
+    },
+    {
+        "filename": "sample_0008.las",
+        "shape_type": "Gaussian",
+        "terrain_type": "Uneven",
+        "height_m": 0.3181,
+        "radius_m": 1.3599,
+        "rotation_z_rad": 3.8846,
+        "translation_xy": [
+            0.2963,
+            0.3639
+        ],
+        "point_count": 92035,
+        "noise_level_m": 0.005,
+        "volume_m3": 0.591153,
+        "sensor_position": [
+            0.9309,
+            1.6547,
+            2.1397
+        ],
+        "scan_resolution_deg": [
+            0.315,
+            0.23
+        ]
+    },
+    {
+        "filename": "sample_0009.las",
+        "shape_type": "Gaussian",
+        "terrain_type": "Flat",
+        "height_m": 0.968,
+        "radius_m": 1.6426,
+        "rotation_z_rad": 5.1186,
+        "translation_xy": [
+            -0.483,
+            -0.2826
+        ],
+        "point_count": 128593,
+        "noise_level_m": 0.0049,
+        "volume_m3": 2.6247,
+        "sensor_position": [
+            -1.3876,
+            1.5687,
+            1.9745
+        ],
+        "scan_resolution_deg": [
+            0.19,
+            0.188
+        ]
+    }
+]
