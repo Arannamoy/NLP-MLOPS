@@ -23,3 +23,7 @@ faiss_index
 *.db
 *.tflite
 *.task
+*.pt
+Thumbs-up-&-Thumbs-down-3
+train
+train-2
