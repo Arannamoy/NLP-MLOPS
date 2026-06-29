@@ -27,7 +27,7 @@ faiss_index
 Thumbs-up-&-Thumbs-down-3
 train
 train-2
-.pth
+*.pth
 sample_data
 sample_data_2
 synthetic_piles_data

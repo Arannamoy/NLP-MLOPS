@@ -20,7 +20,10 @@
 - DL
     - [Activation function](#activation-function)
     - [Different RNN architecture](#different-rnn-architecture)
-     - <a href="https://github.com/Arannamoy-Mondal/AI-ML-DL/blob/main/version%202/DL/Readme.md">More</a>
+    - <a href="https://github.com/Arannamoy-Mondal/AI-ML-DL/blob/main/version%202/DL/Readme.md">More</a>
+    - [The most important topics for understanding any deep learning model architecture](#the-most-important-topics-for-understanding-any-deep-learning-model-architecture)
+        - [Linear Layer](#linear-fully-connected)
+        - [MLP](#multi-layer-perceptron-mlp)
 # Proxmox set up for gpu passthrough
 #### 🛠️ Edit GRUB
 - Open the GRUB configuration file:
@@ -812,3 +815,1343 @@ These compute distances or similarities between samples.
 | Tabular fraud with no time component                        | XGBoost / TabNet              | No sequence = no need for recurrence               |
 | Ultra-long sequences (10k+ time steps)                      | Mamba / S4 / Linear Attention | LSTM gradients still decay over extreme lengths    |
 | Need to explain *why* a transaction is fraud                | Attention + Transformer       | Attention weights show which past events mattered  |
+
+
+# The most important topics for understanding any deep learning model architecture
+
+
+# Deep Learning Foundations
+
+## Basic Layers
+
+### Linear (Fully Connected)
+## Linear (Fully Connected) Layer
+
+The **Linear Layer** (also called the **Fully Connected (FC) Layer** or **Dense Layer**) is one of the most fundamental layers in deep learning. It performs a **linear transformation** on the input features.
+
+---
+
+## Mathematical Formula
+
+Given an input vector **x**, the output is
+
+[
+y = Wx + b
+]
+
+where:
+
+* **x** = Input vector (features)
+* **W** = Weight matrix (learnable parameters)
+* **b** = Bias vector (learnable parameters)
+* **y** = Output vector
+
+---
+
+## Intuition
+
+Think of it as:
+
+> **Every output neuron is connected to every input neuron.**
+
+Example:
+
+```
+Input Layer              Output Layer
+
+x1  ● ───────────────┐
+      \              │
+x2  ● ───────────┐   │
+       \         │   │
+x3  ● ───┐       │   │
+          \      │   │
+x4  ●─────●──────●───●
+```
+
+Every input contributes to every output.
+
+---
+
+## What Does It Learn?
+
+A Linear layer learns
+
+* Feature importance
+* Feature combinations
+* Decision boundaries
+* Hidden representations
+
+It **does not learn nonlinear relationships** by itself.
+
+That's why it is almost always followed by an activation function like:
+
+```
+Linear
+   ↓
+ReLU
+   ↓
+Linear
+   ↓
+ReLU
+   ↓
+Output
+```
+
+---
+
+## PyTorch Syntax
+
+```python
+import torch.nn as nn
+
+layer = nn.Linear(
+    in_features=128,
+    out_features=64,
+    bias=True
+)
+```
+
+---
+
+## Parameters
+
+| Parameter      | Description                         |
+| -------------- | ----------------------------------- |
+| `in_features`  | Number of input features            |
+| `out_features` | Number of output features           |
+| `bias`         | Whether to include a learnable bias |
+
+---
+
+## Input & Output Shape
+
+### Input
+
+```
+(batch_size, in_features)
+```
+
+Example
+
+```python
+(32, 128)
+```
+
+32 samples, each having 128 features.
+
+---
+
+### Output
+
+```
+(batch_size, out_features)
+```
+
+Example
+
+```python
+(32, 64)
+```
+
+---
+
+## Example
+
+```python
+import torch
+import torch.nn as nn
+
+linear = nn.Linear(4, 2)
+
+x = torch.randn(3, 4)
+
+y = linear(x)
+
+print(x.shape)
+print(y.shape)
+```
+
+Output
+
+```
+torch.Size([3, 4])
+torch.Size([3, 2])
+```
+
+---
+
+## Internally
+
+Suppose
+
+```
+Input Features = 4
+Output Features = 2
+```
+
+Then
+
+```
+Weight Matrix
+
+      4 Inputs
+    ┌────────────┐
+2   │ w11 w12... │
+Out │ w21 w22... │
+    └────────────┘
+```
+
+Weight shape:
+
+```
+(2,4)
+```
+
+Bias shape:
+
+```
+(2,)
+```
+
+---
+
+## Number of Parameters
+
+Formula
+
+[
+\text{Parameters} = (\text{Input Features} \times \text{Output Features}) + \text{Output Features (Bias)}
+]
+
+Example
+
+```python
+nn.Linear(128,64)
+```
+
+Parameters
+
+```
+Weights
+
+128 × 64 = 8192
+
+Bias
+
+64
+
+Total
+
+8256
+```
+
+---
+
+## Why Is It Called "Fully Connected"?
+
+Because
+
+```
+Every Input
+        │
+        ▼
+Every Output
+```
+
+There are no missing connections.
+
+---
+
+## Advantages
+
+* Simple and efficient
+* Learns feature combinations
+* Widely used in almost every neural network
+* Differentiable and trainable with backpropagation
+
+---
+
+## Limitations
+
+* Cannot model nonlinear relationships alone
+* Large number of parameters for high-dimensional inputs
+* Prone to overfitting if the network is too large
+* Ignores spatial structure (unlike convolutional layers)
+
+---
+
+## Common Use Cases
+
+* Final classification layer
+* Regression output layer
+* Multi-Layer Perceptrons (MLPs)
+* Feature projection
+* Embedding transformations
+* Attention mechanisms (e.g., Query, Key, Value projections in Transformers)
+
+---
+
+## Example in a Neural Network
+
+```python
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(784, 256),
+    nn.ReLU(),
+    nn.Linear(256, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+```
+
+Flow:
+
+```
+Input (784)
+      ↓
+Linear (784→256)
+      ↓
+ReLU
+      ↓
+Linear (256→128)
+      ↓
+ReLU
+      ↓
+Linear (128→10)
+      ↓
+Output
+```
+
+---
+
+## Key Takeaways
+
+* **Purpose:** Applies a learnable linear transformation to input features.
+* **Formula:** ( y = Wx + b )
+* **Connections:** Every input neuron connects to every output neuron.
+* **Learnable Parameters:** Weights and optional bias.
+* **Input Shape:** `(batch_size, in_features)`
+* **Output Shape:** `(batch_size, out_features)`
+* **Typical Role:** Feature transformation, classification, regression, and hidden layers in neural networks.
+
+
+### Multi-Layer Perceptron (MLP)
+
+# Multi-Layer Perceptron (MLP)
+
+A **Multi-Layer Perceptron (MLP)** is one of the most fundamental neural network architectures. It consists of multiple **fully connected (linear) layers** with **non-linear activation functions** between them.
+
+An MLP learns complex mappings from input features to output predictions.
+
+---
+
+# Architecture
+
+```text
+Input
+  │
+  ▼
+Linear
+  │
+ReLU
+  │
+Linear
+  │
+ReLU
+  │
+Linear
+  │
+Output
+```
+
+Example:
+
+```text
+784
+ │
+ ▼
+Linear(784→256)
+ │
+ReLU
+ │
+ ▼
+Linear(256→128)
+ │
+ReLU
+ │
+ ▼
+Linear(128→10)
+ │
+ ▼
+Prediction
+```
+
+---
+
+# Mathematical Formula
+
+For one hidden layer:
+
+[
+h = f(W_1x+b_1)
+]
+
+[
+y = W_2h+b_2
+]
+
+where
+
+* (x) = input
+* (W) = weight matrix
+* (b) = bias
+* (f) = activation function (ReLU, GELU, etc.)
+
+For deeper MLPs:
+
+[
+x
+\rightarrow
+Linear
+\rightarrow
+Activation
+\rightarrow
+Linear
+\rightarrow
+Activation
+\rightarrow
+\cdots
+\rightarrow
+Output
+]
+
+---
+
+# PyTorch Implementation
+
+```python
+import torch
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.network = nn.Sequential(
+            nn.Linear(784, 256),
+            nn.ReLU(),
+
+            nn.Linear(256, 128),
+            nn.ReLU(),
+
+            nn.Linear(128, 10)
+        )
+
+    def forward(self, x):
+        return self.network(x)
+```
+
+---
+
+# Simple Example
+
+```python
+import torch
+
+x = torch.randn(32, 784)
+
+model = MLP()
+
+y = model(x)
+
+print(y.shape)
+```
+
+Output
+
+```text
+torch.Size([32, 10])
+```
+
+---
+
+# Tensor Shape Flow
+
+Suppose
+
+```text
+Batch Size = 32
+
+Input Features = 784
+```
+
+```text
+Input
+(32,784)
+
+↓
+
+Linear(784→256)
+
+↓
+
+(32,256)
+
+↓
+
+ReLU
+
+↓
+
+(32,256)
+
+↓
+
+Linear(256→128)
+
+↓
+
+(32,128)
+
+↓
+
+ReLU
+
+↓
+
+(32,128)
+
+↓
+
+Linear(128→10)
+
+↓
+
+(32,10)
+```
+
+---
+
+# Why Use Activation Between Layers?
+
+Without activation:
+
+```text
+Linear
+↓
+
+Linear
+↓
+
+Linear
+```
+
+is mathematically equivalent to
+
+```text
+One Linear Layer
+```
+
+So stacking only linear layers adds **no extra expressive power**.
+
+Activation functions introduce **non-linearity**, allowing the network to model complex relationships.
+
+---
+
+# Common Activation Functions
+
+```python
+nn.ReLU()
+nn.LeakyReLU()
+nn.GELU()
+nn.Sigmoid()
+nn.Tanh()
+```
+
+Example:
+
+```python
+model = nn.Sequential(
+    nn.Linear(784, 256),
+    nn.GELU(),
+
+    nn.Linear(256, 128),
+    nn.GELU(),
+
+    nn.Linear(128, 10)
+)
+```
+
+---
+
+# Hidden Layers
+
+Example:
+
+```text
+Input
+
+↓
+
+Hidden Layer 1
+
+↓
+
+Hidden Layer 2
+
+↓
+
+Hidden Layer 3
+
+↓
+
+Output
+```
+
+Each hidden layer extracts progressively higher-level features.
+
+---
+
+# Advantages
+
+* Simple to implement.
+* Learns non-linear relationships.
+* Works well for tabular data.
+* Suitable for regression and classification tasks.
+* Efficient for low-dimensional feature vectors.
+
+---
+
+# Limitations
+
+* Does not preserve spatial structure (unlike CNNs).
+* Does not model sequential dependencies (unlike RNNs or Transformers).
+* Parameter count grows rapidly with input size.
+* Can overfit without regularization.
+
+---
+
+# Regularization Techniques
+
+To improve generalization:
+
+```python
+nn.Sequential(
+    nn.Linear(784,256),
+    nn.ReLU(),
+
+    nn.Dropout(0.5),
+
+    nn.Linear(256,128),
+    nn.ReLU(),
+
+    nn.BatchNorm1d(128),
+
+    nn.Linear(128,10)
+)
+```
+
+Common techniques:
+
+* **Dropout**: Randomly deactivates neurons during training.
+* **Batch Normalization**: Stabilizes and accelerates training.
+* **Weight Decay (L2 Regularization)**: Penalizes large weights.
+* **Early Stopping**: Stops training when validation performance no longer improves.
+
+---
+
+# Computational Complexity
+
+For a linear layer:
+
+```text
+Input: N × D_in
+Output: N × D_out
+```
+
+Time Complexity:
+
+[
+O(N \times D_{in} \times D_{out})
+]
+
+Memory Complexity:
+
+[
+O(D_{in} \times D_{out})
+]
+
+where:
+
+* (N) = batch size
+* (D_{in}) = input dimension
+* (D_{out}) = output dimension
+
+---
+
+# Applications
+
+* Tabular data classification
+* Tabular data regression
+* Credit scoring
+* Medical diagnosis
+* Recommendation systems (MLP heads)
+* NLP classifier heads
+* Vision classifier heads
+* Feature projection layers
+* Autoencoders
+* Reinforcement learning policy/value networks
+
+---
+
+# MLP vs Linear Layer
+
+| Linear Layer                      | MLP                                       |
+| --------------------------------- | ----------------------------------------- |
+| Single fully connected layer      | Multiple fully connected layers           |
+| No hidden layers                  | One or more hidden layers                 |
+| Usually one linear transformation | Multiple transformations with activations |
+| Learns only linear relationships  | Learns complex non-linear relationships   |
+| Lower parameter count             | Higher parameter count                    |
+| Lower expressive power            | Higher expressive power                   |
+
+---
+
+# Key Takeaways
+
+* An **MLP** is a stack of **Linear (Fully Connected)** layers separated by **non-linear activation functions**.
+* Hidden layers enable the network to learn increasingly abstract feature representations.
+* Activations such as **ReLU** or **GELU** are essential; without them, multiple linear layers collapse into a single linear transformation.
+* MLPs are highly effective for **tabular data**, as well as **classification**, **regression**, and **feature transformation** tasks.
+* Regularization techniques like **Dropout**, **BatchNorm**, and **Weight Decay** help reduce overfitting and improve generalization.
+
+
+### Embedding Layer
+
+# Embedding Layer
+
+An **Embedding Layer** is a neural network layer that converts **discrete categorical data (IDs, words, tokens, classes, etc.) into dense continuous vectors** that the model can learn.
+
+Instead of representing categories using one-hot vectors, an embedding maps each category to a trainable vector.
+
+---
+
+## Intuition
+
+Suppose we have 5 fruits:
+
+| Fruit  | ID |
+| ------ | -- |
+| Apple  | 0  |
+| Banana | 1  |
+| Orange | 2  |
+| Mango  | 3  |
+| Grape  | 4  |
+
+Instead of:
+
+```
+Apple  -> [1,0,0,0,0]
+Banana -> [0,1,0,0,0]
+```
+
+Embedding converts them into:
+
+```
+Apple  -> [ 0.52, -0.31, 1.24 ]
+Banana -> [ 0.48, -0.29, 1.18 ]
+Orange -> [-0.72,  0.95, 0.11 ]
+Mango  -> [ 1.10, -0.82, 0.53 ]
+Grape  -> [-0.41,  0.67,-1.22 ]
+```
+
+These vectors are **learned automatically during training**.
+
+---
+
+# Why Do We Need Embeddings?
+
+One-hot encoding has several problems:
+
+### 1. High Dimensional
+
+For 100,000 words:
+
+```
+One-hot length = 100,000
+```
+
+Embedding:
+
+```
+Embedding size = 128
+```
+
+Much smaller.
+
+---
+
+### 2. No Semantic Information
+
+One-hot:
+
+```
+Cat = [1,0,0]
+Dog = [0,1,0]
+Car = [0,0,1]
+```
+
+Distance:
+
+```
+Cat ↔ Dog = Same as Cat ↔ Car
+```
+
+The model cannot know that cats and dogs are similar.
+
+Embedding learns:
+
+```
+Cat = [0.8,0.2,-0.5]
+Dog = [0.7,0.1,-0.6]
+Car = [-0.9,1.2,0.4]
+```
+
+Now:
+
+```
+Cat ≈ Dog
+Cat ≠ Car
+```
+
+---
+
+# Embedding Matrix
+
+Suppose
+
+```
+Vocabulary Size = 5
+Embedding Dimension = 3
+```
+
+Then the embedding matrix is
+
+```
+           Dim1   Dim2   Dim3
+Word0 ->   0.3   -0.1    1.5
+Word1 ->  -0.7    0.4    0.8
+Word2 ->   1.2    0.9   -0.3
+Word3 ->  -0.5   -0.6    0.7
+Word4 ->   0.8    1.4   -1.2
+```
+
+Shape:
+
+```
+(5 × 3)
+```
+
+General:
+
+```
+(num_embeddings, embedding_dim)
+```
+
+---
+
+# How It Works
+
+Input IDs:
+
+```
+[2,4,1]
+```
+
+Embedding layer simply performs a lookup:
+
+```
+Embedding Matrix
+
+0 → [...]
+1 → [...]
+2 → [1.2,0.9,-0.3]
+3 → [...]
+4 → [0.8,1.4,-1.2]
+```
+
+Output:
+
+```
+[
+ [1.2,0.9,-0.3],
+ [0.8,1.4,-1.2],
+ [-0.7,0.4,0.8]
+]
+```
+
+No multiplication is performed.
+
+It is simply:
+
+```
+Output = EmbeddingMatrix[input_id]
+```
+
+---
+
+# PyTorch Syntax
+
+```python
+import torch
+import torch.nn as nn
+
+embedding = nn.Embedding(
+    num_embeddings=10000,
+    embedding_dim=128
+)
+```
+
+Parameters:
+
+```
+num_embeddings = Vocabulary size
+
+embedding_dim = Vector size
+```
+
+---
+
+# Example
+
+```python
+import torch
+import torch.nn as nn
+
+embedding = nn.Embedding(5, 3)
+
+x = torch.tensor([0, 2, 4])
+
+y = embedding(x)
+
+print(y)
+print(y.shape)
+```
+
+Output shape:
+
+```
+torch.Size([3,3])
+```
+
+because
+
+```
+3 IDs
+
+↓
+
+each becomes
+
+↓
+
+3-dimensional vector
+```
+
+---
+
+# Batch Example
+
+Input:
+
+```python
+x = torch.tensor([
+    [1,3,4],
+    [0,2,1]
+])
+```
+
+Shape:
+
+```
+(2,3)
+```
+
+Meaning:
+
+```
+2 sentences
+
+Each sentence has 3 words
+```
+
+Embedding:
+
+```python
+embedding = nn.Embedding(5,8)
+
+y = embedding(x)
+```
+
+Output shape:
+
+```
+(2,3,8)
+```
+
+Explanation:
+
+```
+Batch = 2
+
+Sequence Length = 3
+
+Embedding Size = 8
+```
+
+---
+
+# Learnable Parameters
+
+The embedding matrix is trainable.
+
+Example:
+
+```
+Before Training
+
+Dog = [0.4,-0.2,0.8]
+
+Cat = [-1.1,0.3,-0.5]
+```
+
+After many epochs:
+
+```
+Dog = [0.62,-0.15,1.04]
+
+Cat = [0.60,-0.11,1.01]
+```
+
+The vectors become similar because they appear in similar contexts.
+
+---
+
+# Embedding vs One-Hot
+
+| Feature               | One-Hot | Embedding     |
+| --------------------- | ------- | ------------- |
+| Dense                 | ❌       | ✅             |
+| Trainable             | ❌       | ✅             |
+| Captures similarity   | ❌       | ✅             |
+| Memory efficient      | ❌       | ✅             |
+| Used in Deep Learning | Rarely  | Almost always |
+
+---
+
+# Applications
+
+Embedding layers are widely used for categorical inputs in deep learning:
+
+* **Natural Language Processing (NLP):** words, tokens, subwords.
+* **Recommendation Systems:** user IDs and item IDs.
+* **Tabular Data:** categorical features such as country, product ID, or customer ID.
+* **Graphs (GNNs):** node IDs, edge types, relation types.
+* **Time Series:** categorical time features (e.g., day of week, month).
+* **Computer Vision:** discrete labels or codebook indices in models such as vision transformers and vector quantization.
+* **3D Point Clouds:** object class embeddings, semantic labels, or learned query embeddings (point coordinates themselves are typically processed by MLPs rather than embedding layers).
+
+---
+
+# Computational Complexity
+
+If:
+
+```
+Vocabulary Size = V
+
+Embedding Dimension = D
+
+Input Length = N
+```
+
+Then:
+
+* **Parameter count:** `V × D`
+* **Lookup time:** `O(N)`
+* **Output shape:** `(N, D)` for a single sequence, or `(Batch, Sequence, D)` for batched input.
+
+---
+
+# Summary
+
+* An **Embedding Layer** converts **integer IDs** into **dense, trainable vectors**.
+* It stores a learnable matrix of shape **(num_embeddings, embedding_dim)**.
+* Each input ID performs a **lookup** into this matrix—no matrix multiplication is required.
+* The embedding vectors are updated through **backpropagation** during training.
+* Embeddings are far more compact and informative than one-hot encodings, allowing models to learn semantic relationships between categories.
+
+
+### Activation Functions
+
+#### Sigmoid
+
+#### Tanh
+
+#### ReLU
+
+#### LeakyReLU
+
+#### GELU
+
+#### Softmax
+
+### Normalization
+
+#### BatchNorm
+
+#### LayerNorm
+
+### Regularization
+
+#### Dropout
+
+#### Weight Decay
+
+#### Early Stopping
+
+---
+
+# CNN & Computer Vision
+
+## CNN Building Blocks
+
+### Convolution
+
+#### Conv1D
+
+#### Conv2D
+
+#### Conv3D
+
+### Pooling
+
+#### Max Pooling
+
+#### Average Pooling
+
+#### Global Max Pooling
+
+#### Global Average Pooling
+
+### Upsampling
+
+#### Upsampling
+
+#### Transposed Convolution
+
+---
+
+## CNN Architectures
+
+### CNN
+
+### ResNet
+
+### DenseNet
+
+### U-Net
+
+---
+
+## Computer Vision Design Patterns
+
+### Encoder
+
+### Decoder
+
+### Skip Connection
+
+### Residual Connection
+
+### Feature Pyramid Network (FPN)
+
+---
+
+# Attention & Transformers
+
+## Attention Mechanisms
+
+### Self Attention
+
+### Multi-Head Attention
+
+### Cross Attention
+
+### Channel Attention
+
+### Spatial Attention
+
+### SE Block
+
+### CBAM
+
+---
+
+## Transformer Architectures
+
+### Positional Encoding
+
+### Vision Transformer (ViT)
+
+### Swin Transformer
+
+---
+
+# Point Cloud Deep Learning
+
+## Point Cloud Fundamentals
+
+### KNN Graph
+
+### Radius Graph
+
+### Dynamic Graph
+
+---
+
+## PointNet Family
+
+### Shared MLP
+
+### T-Net
+
+### PointNet Encoder
+
+### PointNet
+
+### PointNet++ Set Abstraction
+
+### Feature Propagation
+
+### PointNet++
+
+---
+
+## Dynamic Graph Networks
+
+### EdgeConv
+
+### DGCNN
+
+---
+
+## Advanced Point Cloud Networks
+
+### Point Transformer
+
+### KPConv
+
+---
+
+# Graph Neural Networks
+
+## Graph Fundamentals
+
+### Message Passing
+
+---
+
+## Graph Architectures
+
+### Graph Convolutional Network (GCN)
+
+### GraphSAGE
+
+### Graph Attention Network (GAT)
+
+### Graph Transformer
+
+---
+
+# Training & Optimization
+
+## Loss Functions
+
+### MSE
+
+### MAE
+
+### Huber Loss
+
+### Cross Entropy Loss
+
+### Focal Loss
+
+---
+
+## Optimizers
+
+### SGD
+
+### Adam
+
+### AdamW
+
+---
+
+## Learning Rate Scheduling
+
+### StepLR
+
+### Cosine Annealing
+
+### ReduceLROnPlateau
+
+---
+
+## Data Augmentation
+
+### Image Augmentation
+
+### Point Cloud Augmentation
+
+---
+
+# PyTorch Fundamentals
+
+## Data Pipeline
+
+### Dataset
+
+### DataLoader
+
+### Custom Dataset
+
+### Data Transformation
+
+---
+
+## Model Construction
+
+### Tensor
+
+### Autograd
+
+### nn.Module
+
+### Forward Pass
+
+### Backward Pass
+
+### optimizer.step()
+
+### state_dict()
+
+### Checkpoint
+
+
+
+
+

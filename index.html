@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ডীপ লার্নিং কমপ্লিট গাইড | Deep Learning Bangla</title>
+<script>
+  MathJax = {
+    tex: {inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']]},
+    svg: {fontCache: 'global'}
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#111833; --card:#151d3d; --card2:#1b2450;
+  --text:#e6ebff; --muted:#9aa3c7; --accent:#6ee7ff; --accent2:#a78bfa;
+  --green:#34d399; --red:#f87171; --yellow:#fbbf24; --border:#2a3366;
+  --code-bg:#0a0f24;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Noto Sans Bengali','Hind Siliguri',sans-serif;line-height:1.7;scroll-behavior:smooth}
+body{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  width:280px;background:linear-gradient(180deg,#0a0f24,#0b1020);
+  border-right:1px solid var(--border);position:fixed;top:0;left:0;
+  height:100vh;overflow-y:auto;padding:20px 0;z-index:100;
+  transition:transform .3s;
+}
+.sidebar h2{color:var(--accent);padding:0 20px;font-size:1.1rem;margin-bottom:10px}
+.sidebar .logo{padding:0 20px 15px;border-bottom:1px solid var(--border);margin-bottom:15px}
+.sidebar .logo span{font-size:1.4rem;font-weight:bold;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-group{margin-bottom:8px}
+.nav-title{
+  padding:8px 20px;color:var(--muted);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:1px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  user-select:none;
+}
+.nav-title:hover{color:var(--accent)}
+.nav-title::after{content:'▾';font-size:.8rem;transition:transform .2s}
+.nav-group.collapsed .nav-title::after{transform:rotate(-90deg)}
+.nav-group.collapsed .nav-links{display:none}
+.nav-links a{
+  display:block;padding:6px 20px 6px 30px;color:var(--text);text-decoration:none;
+  font-size:.85rem;border-left:2px solid transparent;transition:all .2s;
+}
+.nav-links a:hover{background:var(--card);border-left-color:var(--accent);color:var(--accent)}
+
+/* Main */
+.main{margin-left:280px;flex:1;padding:30px 40px;max-width:1200px}
+.hero{
+  background:linear-gradient(135deg,#1b2450,#0b1020);
+  border:1px solid var(--border);border-radius:16px;padding:40px;margin-bottom:30px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(110,231,255,.15),transparent 70%);
+}
+.hero h1{font-size:2.4rem;margin-bottom:10px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:700px}
+
+.section{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  margin-bottom:20px;overflow:hidden;
+}
+.section-header{
+  padding:18px 24px;background:var(--card2);cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+  user-select:none;transition:background .2s;
+}
+.section-header:hover{background:#222b5c}
+.section-header h2{font-size:1.25rem;color:var(--accent)}
+.section-header .toggle{font-size:1.2rem;color:var(--accent2);transition:transform .3s}
+.section.collapsed .toggle{transform:rotate(-90deg)}
+.section.collapsed .section-body{display:none}
+.section-body{padding:24px}
+
+h3{color:var(--accent2);margin:20px 0 10px;font-size:1.15rem;border-left:3px solid var(--accent2);padding-left:10px}
+h4{color:var(--green);margin:16px 0 8px;font-size:1.05rem}
+h5{color:var(--yellow);margin:12px 0 6px;font-size:.98rem}
+p{margin:8px 0;color:var(--text)}
+ul,ol{margin:8px 0 8px 25px}
+li{margin:4px 0}
+
+.info-box{
+  background:rgba(110,231,255,.08);border-left:4px solid var(--accent);
+  padding:12px 16px;border-radius:6px;margin:12px 0;
+}
+.warn-box{
+  background:rgba(251,191,36,.08);border-left:4px solid var(--yellow);
+  padding:12px 16px;border-radius:6px;margin:12px 0;
+}
+.formula-box{
+  background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:16px;margin:12px 0;overflow-x:auto;
+}
+.symbol-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.symbol-table th,.symbol-table td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+.symbol-table th{background:var(--card2);color:var(--accent)}
+.symbol-table td:first-child{font-family:'Courier New',monospace;color:var(--yellow);font-weight:bold}
+
+/* Code */
+pre{
+  background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:16px;overflow-x:auto;margin:12px 0;position:relative;
+  font-family:'Consolas','Monaco',monospace;font-size:.88rem;line-height:1.5;
+}
+pre code{color:#e6ebff}
+.kw{color:#c792ea}.fn{color:#82aaff}.str{color:#c3e88d}.num{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.dec{color:#ffcb6b}.cls{color:#ffcb6b}
+.copy-btn{
+  position:absolute;top:8px;right:8px;background:var(--card2);color:var(--text);
+  border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:.75rem;
+}
+.copy-btn:hover{background:var(--accent);color:#000}
+
+/* Diagram */
+.diagram{
+  background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  padding:20px;margin:14px 0;overflow-x:auto;text-align:center;
+}
+.diagram svg{max-width:100%;height:auto}
+
+/* Practice */
+.practice{
+  background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(110,231,255,.05));
+  border:1px solid var(--accent2);border-radius:8px;padding:16px;margin:16px 0;
+}
+.practice h5{color:var(--accent2);margin-top:0}
+.answer-toggle{
+  background:var(--accent2);color:#000;border:none;padding:6px 14px;border-radius:4px;
+  cursor:pointer;font-weight:bold;margin-top:8px;font-size:.85rem;
+}
+.answer-toggle:hover{background:var(--accent)}
+.answer{display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,.3);border-radius:6px;border-left:3px solid var(--green)}
+.answer.show{display:block}
+
+/* Table */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+th{background:var(--card2);color:var(--accent)}
+
+/* Mobile */
+.menu-btn{display:none;position:fixed;top:15px;left:15px;z-index:200;background:var(--accent);color:#000;border:none;width:40px;height:40px;border-radius:6px;cursor:pointer;font-size:1.2rem}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:20px}
+  .menu-btn{display:block}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2)}
+
+.tag{display:inline-block;background:var(--card2);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:.75rem;margin:0 4px}
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo"><span>🧠 DL Bangla</span></div>
+  <h2>নেভিগেশন</h2>
+
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">PyTorch Fundamentals</div>
+    <div class="nav-links">
+      <a href="#pytorch">ডেটা পাইপলাইন</a>
+      <a href="#tensor">Tensor & Autograd</a>
+      <a href="#module">nn.Module & Training</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">Core Layers</div>
+    <div class="nav-links">
+      <a href="#linear">Linear / MLP</a>
+      <a href="#embedding">Embedding</a>
+      <a href="#activation">Activation Functions</a>
+      <a href="#norm">Normalization</a>
+      <a href="#reg">Regularization</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">CNN & Vision</div>
+    <div class="nav-links">
+      <a href="#conv">Convolution</a>
+      <a href="#pool">Pooling & Upsampling</a>
+      <a href="#arch">CNN Architectures</a>
+      <a href="#cv-pattern">Design Patterns</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">Attention & Transformers</div>
+    <div class="nav-links">
+      <a href="#attention">Attention Mechanisms</a>
+      <a href="#transformer">Transformer Architectures</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">Point Cloud</div>
+    <div class="nav-links">
+      <a href="#pc-fund">Fundamentals</a>
+      <a href="#pointnet">PointNet Family</a>
+      <a href="#dgcnn">DGCNN & EdgeConv</a>
+      <a href="#pc-adv">Advanced Networks</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">Graph Neural Networks</div>
+    <div class="nav-links">
+      <a href="#gnn">GNN Architectures</a>
+    </div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title" onclick="this.parentElement.classList.toggle('collapsed')">Training</div>
+    <div class="nav-links">
+      <a href="#loss">Loss Functions</a>
+      <a href="#optim">Optimizers</a>
+      <a href="#sched">LR Scheduling</a>
+      <a href="#aug">Data Augmentation</a>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+<div class="hero">
+  <h1>ডীপ লার্নিং কমপ্লিট গাইড</h1>
+  <p>PyTorch, CNN, Transformer, Point Cloud, GNN — সবকিছু বাংলায়। প্রতিটি টপিকের গাণিতিক ব্যাখ্যা, আর্কিটেকচার ডায়াগ্রাম, কোড ইমপ্লিমেন্টেশন এবং প্র্যাকটিস টাস্ক সহ।</p>
+</div>
+
+<!-- ================= PYTORCH FUNDAMENTALS ================= -->
+<section class="section" id="pytorch">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🔧 PyTorch Fundamentals</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Tensor</h3>
+  <p><b>Tensor</b> হলো PyTorch-এর মূল ডেটা স্ট্রাকচার — এটি NumPy array-এর মতো কিন্তু GPU-তে চলতে পারে এবং autograd সাপোর্ট করে।</p>
+  <table>
+    <tr><th>Dimension</th><th>নাম</th><th>উদাহরণ</th></tr>
+    <tr><td>0D</td><td>Scalar</td><td><code>torch.tensor(5.0)</code></td></tr>
+    <tr><td>1D</td><td>Vector</td><td><code>torch.tensor([1,2,3])</code></td></tr>
+    <tr><td>2D</td><td>Matrix</td><td>Image (grayscale)</td></tr>
+    <tr><td>3D</td><td>3-Tensor</td><td>RGB Image (C,H,W)</td></tr>
+    <tr><td>4D</td><td>4-Tensor</td><td>Batch of images (B,C,H,W)</td></tr>
+  </table>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">import</span> torch
+x = torch.<span class="fn">randn</span>(<span class="num">3</span>, <span class="num">4</span>)          <span class="cm"># 3x4 random tensor</span>
+y = torch.<span class="fn">zeros</span>(<span class="num">2</span>, <span class="num">3</span>)          <span class="cm"># শূন্য দিয়ে পূর্ণ</span>
+z = torch.<span class="fn">arange</span>(<span class="num">0</span>, <span class="num">10</span>, <span class="num">2</span>)      <span class="cm"># [0,2,4,6,8]</span>
+print(x.shape)                <span class="cm"># torch.Size([3,4])</span>
+print(x.dtype)                <span class="cm"># torch.float32</span></code></pre>
+
+  <h3 id="tensor">Autograd (Automatic Differentiation)</h3>
+  <p>Autograd স্বয়ংক্রিয়ভাবে gradient হিসাব করে। <code>requires_grad=True</code> দিলে PyTorch সব অপারেশন ট্র্যাক করে এবং <code>.backward()</code> কল করলে gradient হিসাব হয়।</p>
+  <div class="formula-box">
+    $$\frac{\partial L}{\partial w} = \text{autograd automatically computes via chain rule}$$
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>w = torch.<span class="fn">tensor</span>(<span class="num">2.0</span>, requires_grad=<span class="kw">True</span>)
+x = torch.<span class="fn">tensor</span>(<span class="num">3.0</span>)
+y = w * x + <span class="num">1</span>          <span class="cm"># y = 2x+1 → dy/dw = x = 3</span>
+y.<span class="fn">backward</span>()
+print(w.grad)           <span class="cm"># tensor(3.0)</span></code></pre>
+
+  <h3 id="module">nn.Module</h3>
+  <p>সব নিউরাল নেটওয়ার্ক <code>nn.Module</code> থেকে ইনহেরিট করে। <code>__init__</code>-এ লেয়ার ডিফাইন হয়, <code>forward()</code>-এ ডেটা ফ্লো হয়।</p>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="cls">MyModel</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().__init__()
+        self.fc1 = nn.<span class="fn">Linear</span>(<span class="num">10</span>, <span class="num">5</span>)
+        self.fc2 = nn.<span class="fn">Linear</span>(<span class="num">5</span>, <span class="num">2</span>)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = torch.<span class="fn">relu</span>(self.fc1(x))   <span class="cm"># forward pass</span>
+        <span class="kw">return</span> self.fc2(x)</code></pre>
+
+  <h3>Training Loop (Forward → Loss → Backward → Step)</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>optimizer = torch.optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="num">1e-3</span>)
+criterion = nn.<span class="fn">CrossEntropyLoss</span>()
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(epochs):
+    <span class="kw">for</span> x, y <span class="kw">in</span> dataloader:
+        pred = <span class="fn">model</span>(x)                <span class="cm"># Forward pass</span>
+        loss = <span class="fn">criterion</span>(pred, y)      <span class="cm"># Loss compute</span>
+        optimizer.<span class="fn">zero_grad</span>()          <span class="cm"># Gradient reset</span>
+        loss.<span class="fn">backward</span>()                <span class="cm"># Backward pass</span>
+        optimizer.<span class="fn">step</span>()               <span class="cm"># Weight update</span></code></pre>
+
+  <h3>Dataset, DataLoader, Custom Dataset</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">from</span> torch.utils.data <span class="kw">import</span> Dataset, DataLoader
+
+<span class="kw">class</span> <span class="cls">MyDataset</span>(Dataset):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, X, y):
+        self.X, self.y = X, y
+    <span class="kw">def</span> <span class="fn">__len__</span>(self): <span class="kw">return</span> <span class="fn">len</span>(self.X)
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(self, i): <span class="kw">return</span> self.X[i], self.y[i]
+
+loader = <span class="fn">DataLoader</span>(<span class="fn">MyDataset</span>(X,y), batch_size=<span class="num">32</span>, shuffle=<span class="kw">True</span>)</code></pre>
+
+  <h3>state_dict() & Checkpoint</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="cm"># সেভ করা</span>
+torch.<span class="fn">save</span>({
+    <span class="str">'epoch'</span>: epoch,
+    <span class="str">'model_state'</span>: model.<span class="fn">state_dict</span>(),
+    <span class="str">'optim_state'</span>: optimizer.<span class="fn">state_dict</span>(),
+    <span class="str">'loss'</span>: loss
+}, <span class="str">'ckpt.pt'</span>)
+
+<span class="cm"># লোড করা</span>
+ckpt = torch.<span class="fn">load</span>(<span class="str">'ckpt.pt'</span>)
+model.<span class="fn">load_state_dict</span>(ckpt[<span class="str">'model_state'</span>])</code></pre>
+
+  <div class="practice">
+    <h5>📝 Practice Task 1</h5>
+    <p>একটি 2x3 টেনসর তৈরি করুন যার সব ভ্যালু 1 এবং <code>requires_grad=True</code>। এরপর <code>(x*2).sum().backward()</code> চালান। <code>x.grad</code> কী হবে?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p><b>উত্তর:</b> <code>x.grad</code> হবে সব ভ্যালু 2-এর একটি 2x3 টেনসর। কারণ \(y = \sum 2x_{ij}\), তাই \(\frac{\partial y}{\partial x_{ij}} = 2\)।</p>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= CORE LAYERS ================= -->
+<section class="section" id="linear">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🧱 Linear Layer, MLP, Embedding</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Linear Layer (Fully Connected)</h3>
+  <p>Linear layer ইনপুটকে weight matrix দিয়ে গুণ করে bias যোগ করে। এটি নিউরনের মূল গাণিতিক রূপ।</p>
+  <div class="formula-box">
+    $$y = xW^T + b$$
+    <table class="symbol-table">
+      <tr><th>সিম্বল</th><th>অর্থ</th><th>Shape</th></tr>
+      <tr><td>\(x\)</td><td>ইনপুট ভেক্টর</td><td>\((B, in\_features)\)</td></tr>
+      <tr><td>\(W\)</td><td>ওয়েট ম্যাট্রিক্স (শেখার প্যারামিটার)</td><td>\((out\_features, in\_features)\)</td></tr>
+      <tr><td>\(b\)</td><td>Bias (শিফট প্যারামিটার)</td><td>\((out\_features,)\)</td></tr>
+      <tr><td>\(y\)</td><td>আউটপুট</td><td>\((B, out\_features)\)</td></tr>
+    </table>
+    <p><b>Min/Max Value:</b> PyTorch-এ weight সাধারণত \(\pm\frac{1}{\sqrt{in\_features}}\) রেঞ্জে initialize হয় (Kaiming)। float32-এর রেঞ্জ \(\pm 3.4\times10^{38}\)।</p>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 400 200" width="400">
+      <g fill="#6ee7ff">
+        <circle cx="60" cy="50" r="12"/><circle cx="60" cy="100" r="12"/><circle cx="60" cy="150" r="12"/>
+        <circle cx="340" cy="70" r="12"/><circle cx="340" cy="130" r="12"/>
+      </g>
+      <g stroke="#a78bfa" stroke-width="1.5" fill="none">
+        <line x1="72" y1="50" x2="328" y2="70"/><line x1="72" y1="50" x2="328" y2="130"/>
+        <line x1="72" y1="100" x2="328" y2="70"/><line x1="72" y1="100" x2="328" y2="130"/>
+        <line x1="72" y1="150" x2="328" y2="70"/><line x1="72" y1="150" x2="328" y2="130"/>
+      </g>
+      <text x="20" y="105" fill="#9aa3c7" font-size="12">x (in)</text>
+      <text x="360" y="105" fill="#9aa3c7" font-size="12">y (out)</text>
+    </svg>
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>layer = nn.<span class="fn">Linear</span>(in_features=<span class="num">4</span>, out_features=<span class="num">3</span>)
+x = torch.<span class="fn">randn</span>(<span class="num">8</span>, <span class="num">4</span>)        <span class="cm"># batch=8, features=4</span>
+y = <span class="fn">layer</span>(x)                <span class="cm"># shape: (8, 3)</span>
+print(layer.weight.shape)   <span class="cm"># (3, 4)</span>
+print(layer.bias.shape)     <span class="cm"># (3,)</span></code></pre>
+
+  <h3>MLP (Multi-Layer Perceptron)</h3>
+  <p>একাধিক Linear layer + Activation ফাংশন stacked করে MLP তৈরি হয়। Universal Approximation Theorem অনুযায়ী একটি hidden layer যথেষ্ট যেকোনো continuous function approx করতে।</p>
+  <div class="formula-box">
+    $$h_1 = \sigma(W_1 x + b_1), \quad h_2 = \sigma(W_2 h_1 + b_2), \quad \dots, \quad y = W_L h_{L-1} + b_L$$
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>mlp = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Linear</span>(<span class="num">784</span>, <span class="num">256</span>), nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Linear</span>(<span class="num">256</span>, <span class="num">128</span>), nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Linear</span>(<span class="num">128</span>, <span class="num">10</span>)
+)
+out = <span class="fn">mlp</span>(torch.<span class="fn">randn</span>(<span class="num">32</span>, <span class="num">784</span>))  <span class="cm"># (32, 10)</span></code></pre>
+
+  <h3 id="embedding">Embedding Layer</h3>
+  <p>Embedding ডিসক্রিট টোকেন (যেমন word ID) কে ডেন্স ভেক্টরে ম্যাপ করে। এটি মূলত একটি lookup table।</p>
+  <div class="formula-box">
+    $$E: \{0,1,\dots,V-1\} \to \mathbb{R}^d, \quad E(i) = \text{row } i \text{ of matrix } W_{E}$$
+    <table class="symbol-table">
+      <tr><td>\(V\)</td><td>Vocabulary size (মোট শব্দসংখ্যা)</td></tr>
+      <tr><td>\(d\)</td><td>Embedding dimension</td></tr>
+      <tr><td>\(W_E\)</td><td>Shape: \((V, d)\) — শেখা যায় এমন ম্যাট্রিক্স</td></tr>
+    </table>
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>emb = nn.<span class="fn">Embedding</span>(num_embeddings=<span class="num">10000</span>, embedding_dim=<span class="num">128</span>)
+ids = torch.<span class="fn">tensor</span>([<span class="num">5</span>, <span class="num">42</span>, <span class="num">99</span>])
+vecs = <span class="fn">emb</span>(ids)              <span class="cm"># shape: (3, 128)</span></code></pre>
+
+  <div class="practice">
+    <h5>📝 Practice Task</h5>
+    <p>একটি MLP তৈরি করুন যা 20-ডাইমেনশনাল ইনপুট নিয়ে 5-ক্লাস classification করবে। 2টি hidden layer (64, 32) ব্যবহার করুন। মোট প্যারামিটার কত?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p><b>উত্তর:</b> প্যারামিটার = \((20\times64+64) + (64\times32+32) + (32\times5+5) = 1344 + 2080 + 165 = 3589\)।</p>
+<pre><code>model = nn.Sequential(
+    nn.Linear(20, 64), nn.ReLU(),
+    nn.Linear(64, 32), nn.ReLU(),
+    nn.Linear(32, 5)
+)</code></pre>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= ACTIVATION ================= -->
+<section class="section" id="activation">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>⚡ Activation Functions</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <p>Activation function non-linearity যোগ করে — এটা ছাড়া নেটওয়ার্ক শুধু linear transformation হয়ে যায়।</p>
+
+  <h4>Sigmoid</h4>
+  <div class="formula-box">
+    $$\sigma(x) = \frac{1}{1+e^{-x}}$$
+    <p><b>Range:</b> \((0, 1)\) — binary classification-এ ব্যবহৃত। <b>সমস্যা:</b> vanishing gradient (বড় ইনপুটে gradient≈0)।</p>
+  </div>
+<pre><code>torch.sigmoid(x)</code></pre>
+
+  <h4>Tanh</h4>
+  <div class="formula-box">
+    $$\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}} = 2\sigma(2x)-1$$
+    <p><b>Range:</b> \((-1, 1)\) — zero-centered, sigmoid-এর চেয়ে ভালো।</p>
+  </div>
+
+  <h4>ReLU (Rectified Linear Unit)</h4>
+  <div class="formula-box">
+    $$\text{ReLU}(x) = \max(0, x)$$
+    <p><b>Range:</b> \([0, \infty)\)। সবচেয়ে জনপ্রিয়। <b>সমস্যা:</b> dying ReLU (negative-তে gradient=0)।</p>
+  </div>
+
+  <h4>LeakyReLU</h4>
+  <div class="formula-box">
+    $$\text{LeakyReLU}(x) = \begin{cases} x & x>0 \\ \alpha x & x\le 0 \end{cases}, \quad \alpha \approx 0.01$$
+    <p>Dying ReLU সমস্যা সমাধান করে।</p>
+  </div>
+
+  <h4>GELU (Gaussian Error Linear Unit)</h4>
+  <div class="formula-box">
+    $$\text{GELU}(x) = x \cdot \Phi(x) \approx 0.5x\left(1+\tanh\left[\sqrt{2/\pi}(x+0.044715x^3)\right]\right)$$
+    <p>Transformer (BERT, GPT)-এ ব্যবহৃত। ReLU-র চেয়ে smooth।</p>
+  </div>
+
+  <h4>Softmax</h4>
+  <div class="formula-box">
+    $$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_j e^{x_j}}$$
+    <p><b>Range:</b> প্রতিটি আউটপুট \((0,1)\), সবগুলোর যোগফল = 1। Multi-class classification-এ probability distribution তৈরি করে।</p>
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>act_relu = nn.<span class="fn">ReLU</span>()
+act_lrelu = nn.<span class="fn">LeakyReLU</span>(<span class="num">0.01</span>)
+act_gelu = nn.<span class="fn">GELU</span>()
+probs = torch.<span class="fn">softmax</span>(logits, dim=-<span class="num">1</span>)</code></pre>
+
+  <div class="practice">
+    <h5>📝 Practice Task</h5>
+    <p>\(x = [-2, 0, 2]\) হলে softmax কী হবে?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p>\(e^{-2}=0.135, e^0=1, e^2=7.389\), sum=8.524। Softmax = \([0.016, 0.117, 0.867]\)।</p>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= NORMALIZATION ================= -->
+<section class="section" id="norm">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>📏 Normalization</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3 id="batchnorm">BatchNorm</h3>
+  <p>প্রতিটি feature-কে batch জুড়ে normalize করে। Training-এ batch stats ব্যবহার করে, inference-এ running mean/var।</p>
+  <div class="formula-box">
+    $$\hat{x} = \frac{x - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y = \gamma \hat{x} + \beta$$
+    <table class="symbol-table">
+      <tr><td>\(\mu_B, \sigma_B^2\)</td><td>Batch-এর mean ও variance</td></tr>
+      <tr><td>\(\gamma, \beta\)</td><td>শেখা যায় এমন scale ও shift (learnable)</td></tr>
+      <tr><td>\(\epsilon\)</td><td>স্থিতিশীলতার জন্য ছোট সংখ্যা (1e-5)</td></tr>
+    </table>
+  </div>
+<pre><code>bn = nn.<span class="fn">BatchNorm1d</span>(<span class="num">128</span>)     <span class="cm"># 1D/MLP-এর জন্য</span>
+bn = nn.<span class="fn">BatchNorm2d</span>(<span class="num">64</span>)      <span class="cm"># CNN-এর জন্য (N,C,H,W)</span></code></pre>
+
+  <h3 id="layernorm">LayerNorm</h3>
+  <p>প্রতিটি স্যাম্পলের feature dimension বরাবর normalize করে। Transformer-এ ব্যবহৃত (batch size-এর উপর নির্ভরশীল নয়)।</p>
+  <div class="formula-box">
+    $$\hat{x}_i = \frac{x_i - \mu_L}{\sqrt{\sigma_L^2 + \epsilon}}, \quad y_i = \gamma_i \hat{x}_i + \beta_i$$
+    <p>এখানে \(\mu_L, \sigma_L^2\) প্রতিটি স্যাম্পলের নিজস্ব feature জুড়ে হিসাব হয়।</p>
+  </div>
+<pre><code>ln = nn.<span class="fn">LayerNorm</span>(normalized_shape=[<span class="num">512</span>])  <span class="cm"># Transformer-এ</span></code></pre>
+
+  <table>
+    <tr><th>বৈশিষ্ট্য</th><th>BatchNorm</th><th>LayerNorm</th></tr>
+    <tr><td>Normalize axis</td><td>Batch dimension</td><td>Feature dimension</td></tr>
+    <tr><td>Batch size dependency</td><td>হ্যাঁ</td><td>না</td></tr>
+    <tr><td>ব্যবহার</td><td>CNN</td><td>Transformer, RNN</td></tr>
+  </table>
+
+  </div>
+</section>
+
+<!-- ================= REGULARIZATION ================= -->
+<section class="section" id="reg">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🛡️ Regularization</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Dropout</h3>
+  <p>Training-এ random কিছু নিউরন বন্ধ করে দেয় (p probability-তে)। এটি overfitting কমায়।</p>
+  <div class="formula-box">
+    $$\tilde{h}_i = \begin{cases} 0 & \text{prob } p \\ \frac{h_i}{1-p} & \text{prob } 1-p \end{cases}$$
+    <p>Inference-এ dropout বন্ধ থাকে (model.eval())।</p>
+  </div>
+<pre><code>drop = nn.<span class="fn">Dropout</span>(p=<span class="num">0.5</span>)</code></pre>
+
+  <h3>Weight Decay (L2 Regularization)</h3>
+  <p>Loss-এ weight-এর squared sum যোগ করে weights ছোট রাখে।</p>
+  <div class="formula-box">
+    $$L_{reg} = L + \lambda \sum_i w_i^2$$
+    <p>\(\lambda\) = weight decay strength (সাধারণত 1e-4)।</p>
+  </div>
+<pre><code>optim = torch.optim.<span class="fn">AdamW</span>(model.<span class="fn">parameters</span>(), lr=<span class="num">1e-3</span>, weight_decay=<span class="num">1e-4</span>)</code></pre>
+
+  <h3>Early Stopping</h3>
+  <p>Validation loss আর কমছে না দেখলে training বন্ধ করে দেয়। Overfitting প্রতিরোধ করে।</p>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>best_loss = <span class="fn">float</span>(<span class="str">'inf'</span>)
+patience, counter = <span class="num">10</span>, <span class="num">0</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(epochs):
+    val_loss = <span class="fn">validate</span>(model)
+    <span class="kw">if</span> val_loss < best_loss:
+        best_loss = val_loss; counter = <span class="num">0</span>
+        torch.<span class="fn">save</span>(model.<span class="fn">state_dict</span>(), <span class="str">'best.pt'</span>)
+    <span class="kw">else</span>:
+        counter += <span class="num">1</span>
+        <span class="kw">if</span> counter >= patience: <span class="kw">break</span></code></pre>
+
+  </div>
+</section>
+
+<!-- ================= CNN ================= -->
+<section class="section" id="conv">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🖼️ CNN Building Blocks</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Convolution</h3>
+  <p>Convolution filter/kernel ইনপুটের উপর slide করে local features (edge, texture) extract করে।</p>
+  <div class="formula-box">
+    $$(I * K)(i,j) = \sum_m \sum_n I(i+m, j+n) \cdot K(m,n)$$
+    <p><b>Output size:</b> \(O = \lfloor\frac{W - K + 2P}{S}\rfloor + 1\)</p>
+    <table class="symbol-table">
+      <tr><td>\(I\)</td><td>Input feature map</td></tr>
+      <tr><td>\(K\)</td><td>Kernel size (যেমন 3×3)</td></tr>
+      <tr><td>\(P\)</td><td>Padding</td></tr>
+      <tr><td>\(S\)</td><td>Stride (কত করে slide)</td></tr>
+    </table>
+  </div>
+
+  <h4>Conv1D</h4>
+  <p>1D সিগন্যাল (audio, time series, text) এর জন্য। Input shape: \((B, C_{in}, L)\)।</p>
+<pre><code>conv1d = nn.<span class="fn">Conv1d</span>(in_channels=<span class="num">16</span>, out_channels=<span class="num">32</span>, kernel_size=<span class="num">3</span>, padding=<span class="num">1</span>)</code></pre>
+
+  <h4>Conv2D</h4>
+  <p>Image-এর জন্য সবচেয়ে বেশি ব্যবহৃত। Input: \((B, C, H, W)\)।</p>
+<pre><code>conv2d = nn.<span class="fn">Conv2d</span>(<span class="num">3</span>, <span class="num">64</span>, kernel_size=<span class="num">3</span>, stride=<span class="num">1</span>, padding=<span class="num">1</span>)</code></pre>
+
+  <h4>Conv3D</h4>
+  <p>Video বা 3D medical image-এর জন্য। Input: \((B, C, D, H, W)\)।</p>
+<pre><code>conv3d = nn.<span class="fn">Conv3d</span>(<span class="num">1</span>, <span class="num">32</span>, kernel_size=<span class="num">3</span>)</code></pre>
+
+  <div class="diagram">
+    <svg viewBox="0 0 400 180" width="400">
+      <rect x="20" y="30" width="120" height="120" fill="none" stroke="#6ee7ff" stroke-width="2"/>
+      <g stroke="#6ee7ff" opacity=".4">
+        <line x1="60" y1="30" x2="60" y2="150"/><line x1="100" y1="30" x2="100" y2="150"/>
+        <line x1="20" y1="70" x2="140" y2="70"/><line x1="20" y1="110" x2="140" y2="110"/>
+      </g>
+      <rect x="40" y="50" width="60" height="60" fill="#a78bfa" opacity=".5" stroke="#a78bfa"/>
+      <text x="55" y="85" fill="#fff" font-size="11">3x3 kernel</text>
+      <text x="170" y="95" fill="#fbbf24" font-size="24">→</text>
+      <rect x="210" y="40" width="100" height="100" fill="none" stroke="#34d399" stroke-width="2"/>
+      <text x="230" y="95" fill="#34d399" font-size="12">Feature Map</text>
+    </svg>
+  </div>
+
+  </div>
+</section>
+
+<section class="section" id="pool">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🔽 Pooling & Upsampling</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Max Pooling</h3>
+  <p>Window-এর সর্বোচ্চ মান নেয়। Spatial size কমায়, prominent feature রাখে।</p>
+  <div class="formula-box">\(y_{i,j} = \max_{(m,n)\in R_{ij}} x_{m,n}\)</div>
+<pre><code>pool = nn.<span class="fn">MaxPool2d</span>(kernel_size=<span class="num">2</span>, stride=<span class="num">2</span>)  <span class="cm"># size অর্ধেক</span></code></pre>
+
+  <h3>Average Pooling</h3>
+  <p>Window-এর গড় নেয়।</p>
+  <div class="formula-box">\(y_{i,j} = \frac{1}{|R_{ij}|}\sum_{(m,n)\in R_{ij}} x_{m,n}\)</div>
+
+  <h3>Global Max/Average Pooling</h3>
+  <p>পুরো feature map-এর উপর pool করে একটি scalar দেয়। FC layer-এর বিকল্প।</p>
+<pre><code>gmp = nn.<span class="fn">AdaptiveMaxPool2d</span>(<span class="num">1</span>)   <span class="cm"># output: (B,C,1,1)</span>
+gap = nn.<span class="fn">AdaptiveAvgPool2d</span>(<span class="num">1</span>)</code></pre>
+
+  <h3>Upsampling</h3>
+  <p>Resolution বাড়ায় (nearest, bilinear interpolation)।</p>
+<pre><code>up = nn.<span class="fn">Upsample</span>(scale_factor=<span class="num">2</span>, mode=<span class="str">'bilinear'</span>)</code></pre>
+
+  <h3>Transposed Convolution (Deconvolution)</h3>
+  <p>Learnable upsampling। Segmentation-এ ব্যবহৃত।</p>
+<pre><code>tc = nn.<span class="fn">ConvTranspose2d</span>(<span class="num">64</span>, <span class="num">32</span>, kernel_size=<span class="num">2</span>, stride=<span class="num">2</span>)  <span class="cm"># 2x up</span></code></pre>
+
+  </div>
+</section>
+
+<section class="section" id="arch">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🏛️ CNN Architectures</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Vanilla CNN</h3>
+  <p>Sequential Conv → ReLU → Pool → ... → FC।</p>
+<pre><code>cnn = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Conv2d</span>(<span class="num">1</span>,<span class="num">32</span>,<span class="num">3</span>,padding=<span class="num">1</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">MaxPool2d</span>(<span class="num">2</span>),
+    nn.<span class="fn">Conv2d</span>(<span class="num">32</span>,<span class="num">64</span>,<span class="num">3</span>,padding=<span class="num">1</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">MaxPool2d</span>(<span class="num">2</span>),
+    nn.<span class="fn">Flatten</span>(), nn.<span class="fn">Linear</span>(<span class="num">64</span>*<span class="num">7</span>*<span class="num">7</span>, <span class="num">10</span>)
+)</code></pre>
+
+  <h3>ResNet (Residual Network)</h3>
+  <p>Skip connection যোগ করে gradient flow উন্নত করে। Very deep network সম্ভব হয়।</p>
+  <div class="formula-box">
+    $$y = \mathcal{F}(x, \{W_i\}) + x$$
+    <p>\(\mathcal{F}\) = residual function (2-3 conv layers)। Identity mapping gradient-কে সহজে পেছনে যেতে দেয়।</p>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 400 160" width="400">
+      <rect x="20" y="70" width="60" height="30" fill="#6ee7ff" rx="4"/><text x="30" y="90" font-size="11" fill="#000">Input x</text>
+      <rect x="110" y="40" width="80" height="30" fill="#a78bfa" rx="4"/><text x="120" y="60" font-size="11" fill="#000">Conv+BN+ReLU</text>
+      <rect x="110" y="100" width="80" height="30" fill="#a78bfa" rx="4"/><text x="120" y="120" font-size="11" fill="#000">Conv+BN</text>
+      <rect x="220" y="70" width="50" height="30" fill="#34d399" rx="4"/><text x="235" y="90" font-size="12" fill="#000">+</text>
+      <rect x="300" y="70" width="70" height="30" fill="#fbbf24" rx="4"/><text x="315" y="90" font-size="11" fill="#000">Output y</text>
+      <path d="M80 85 L110 55 M190 55 L220 85 M80 85 L110 115 M190 115 L220 85" stroke="#fff" fill="none"/>
+      <path d="M80 85 Q 150 10 220 85" stroke="#f87171" fill="none" stroke-dasharray="4"/>
+      <text x="140" y="20" fill="#f87171" font-size="10">skip (identity)</text>
+    </svg>
+  </div>
+<pre><code><span class="kw">class</span> <span class="cls">ResBlock</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, c):
+        <span class="fn">super</span>().__init__()
+        self.conv1 = nn.<span class="fn">Conv2d</span>(c,c,<span class="num">3</span>,padding=<span class="num">1</span>)
+        self.bn1 = nn.<span class="fn">BatchNorm2d</span>(c)
+        self.conv2 = nn.<span class="fn">Conv2d</span>(c,c,<span class="num">3</span>,padding=<span class="num">1</span>)
+        self.bn2 = nn.<span class="fn">BatchNorm2d</span>(c)
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">return</span> x + self.<span class="fn">bn2</span>(self.<span class="fn">conv2</span>(F.<span class="fn">relu</span>(self.<span class="fn">bn1</span>(self.<span class="fn">conv1</span>(x)))))</code></pre>
+
+  <h3>DenseNet</h3>
+  <p>প্রতিটি layer পূর্ববর্তী সব layer-এর output concatenate করে। Feature reuse, কম প্যারামিটার।</p>
+  <div class="formula-box">$$x_l = H_l([x_0, x_1, \dots, x_{l-1}])$$</div>
+
+  <h3>U-Net</h3>
+  <p>Encoder-Decoder + Skip Connection। Medical image segmentation-এ standard।</p>
+  <div class="diagram">
+    <svg viewBox="0 0 500 200" width="500">
+      <g fill="none" stroke="#6ee7ff" stroke-width="2">
+        <rect x="20" y="30" width="50" height="30"/><text x="25" y="50" font-size="10" fill="#6ee7ff">in</text>
+        <rect x="90" y="30" width="50" height="30"/>
+        <rect x="160" y="30" width="50" height="30"/>
+        <rect x="230" y="30" width="50" height="30"/>
+      </g>
+      <g fill="none" stroke="#a78bfa" stroke-width="2">
+        <rect x="20" y="140" width="50" height="30"/>
+        <rect x="90" y="140" width="50" height="30"/>
+        <rect x="160" y="140" width="50" height="30"/>
+        <rect x="230" y="140" width="50" height="30"/><text x="235" y="160" font-size="10" fill="#a78bfa">out</text>
+      </g>
+      <path d="M45 60 L45 140 M115 60 L115 140 M185 60 L185 140" stroke="#fbbf24" stroke-dasharray="3"/>
+      <text x="300" y="100" fill="#fbbf24" font-size="11">Skip connections</text>
+      <text x="100" y="100" fill="#9aa3c7" font-size="11">Encoder ↓   ↑ Decoder</text>
+    </svg>
+  </div>
+
+  </div>
+</section>
+
+<section class="section" id="cv-pattern">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🎨 CV Design Patterns</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Encoder-Decoder</h3>
+  <p>Encoder feature extract করে (size কমায়), Decoder reconstruct করে (size বাড়ায়)। Segmentation, Autoencoder-এ ব্যবহৃত।</p>
+
+  <h3>Skip Connection</h3>
+  <p>Encoder এর কোনো layer সরাসরি Decoder এর সংশ্লিষ্ট layer-এ যোগ হয়। Fine-grained detail preserve হয় (U-Net)।</p>
+
+  <h3>Residual Connection</h3>
+  <p>\(y = x + F(x)\) — identity shortcut। Deep network-এ training সহজ করে (ResNet)।</p>
+
+  <h3>Feature Pyramid Network (FPN)</h3>
+  <p>বিভিন্ন scale-এর feature map combine করে multi-scale detection করে। Object detection-এ গুরুত্বপূর্ণ।</p>
+  <div class="diagram">
+    <svg viewBox="0 0 400 180" width="400">
+      <g fill="none" stroke="#6ee7ff" stroke-width="2">
+        <rect x="20" y="130" width="60" height="25"/><text x="25" y="147" font-size="10" fill="#6ee7ff">C1 (large)</text>
+        <rect x="100" y="100" width="60" height="25"/><text x="105" y="117" font-size="10" fill="#6ee7ff">C2</text>
+        <rect x="180" y="70" width="60" height="25"/><text x="185" y="87" font-size="10" fill="#6ee7ff">C3</text>
+        <rect x="260" y="40" width="60" height="25"/><text x="265" y="57" font-size="10" fill="#6ee7ff">C4 (small)</text>
+      </g>
+      <g fill="none" stroke="#a78bfa" stroke-width="2">
+        <rect x="20" y="30" width="60" height="20"/><text x="35" y="45" font-size="9" fill="#a78bfa">P1</text>
+        <rect x="100" y="30" width="60" height="20"/><text x="115" y="45" font-size="9" fill="#a78bfa">P2</text>
+        <rect x="180" y="30" width="60" height="20"/><text x="195" y="45" font-size="9" fill="#a78bfa">P3</text>
+        <rect x="260" y="30" width="60" height="20"/><text x="275" y="45" font-size="9" fill="#a78bfa">P4</text>
+      </g>
+      <path d="M290 65 L270 50 M210 95 L190 50 M130 125 L110 50" stroke="#fbbf24" stroke-dasharray="3"/>
+    </svg>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= ATTENTION ================= -->
+<section class="section" id="attention">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>👁️ Attention Mechanisms</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Self-Attention</h3>
+  <p>সিকোয়েন্সের প্রতিটি টোকেন অন্য সব টোকেনের সাথে সম্পর্ক হিসাব করে। Query, Key, Value ম্যাট্রিক্স ব্যবহার করে।</p>
+  <div class="formula-box">
+    $$\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+    <table class="symbol-table">
+      <tr><td>\(Q = XW_Q\)</td><td>Query — "কী খুঁজছি"</td></tr>
+      <tr><td>\(K = XW_K\)</td><td>Key — "কী আছে"</td></tr>
+      <tr><td>\(V = XW_V\)</td><td>Value — "প্রকৃত তথ্য"</td></tr>
+      <tr><td>\(d_k\)</td><td>Key dimension (scaling factor)</td></tr>
+      <tr><td>\(\sqrt{d_k}\)</td><td>Softmax saturation রোধ করে</td></tr>
+    </table>
+    <p><b>Complexity:</b> \(O(n^2 d)\) — sequence length-এর বর্গের সমানুপাতিক।</p>
+  </div>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">class</span> <span class="cls">SelfAttention</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model):
+        <span class="fn">super</span>().__init__()
+        self.Wq = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.Wk = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.Wv = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.scale = d_model ** <span class="num">0.5</span>
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        Q, K, V = self.<span class="fn">Wq</span>(x), self.<span class="fn">Wk</span>(x), self.<span class="fn">Wv</span>(x)
+        attn = torch.<span class="fn">softmax</span>(Q @ K.<span class="fn">transpose</span>(-<span class="num">2</span>,-<span class="num">1</span>) / self.scale, dim=-<span class="num">1</span>)
+        <span class="kw">return</span> attn @ V</code></pre>
+
+  <h3>Multi-Head Attention</h3>
+  <p>একাধিক attention head parallel-এ চলে, প্রতিটি ভিন্ন subspace শেখে। তারপর concatenate করে linear projection।</p>
+  <div class="formula-box">
+    $$\text{MultiHead}(Q,K,V) = \text{Concat}(\text{head}_1,\dots,\text{head}_h)W_O$$
+    $$\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$
+  </div>
+<pre><code>mha = nn.<span class="fn">MultiheadAttention</span>(embed_dim=<span class="num">512</span>, num_heads=<span class="num">8</span>)
+out, attn = <span class="fn">mha</span>(query, key, value)</code></pre>
+
+  <h3>Cross-Attention</h3>
+  <p>Query একটা source থেকে, Key/Value অন্য source থেকে। Decoder-এ encoder output-এর সাথে attend করতে ব্যবহৃত (Transformer decoder)।</p>
+
+  <h3>Channel Attention (SE Block)</h3>
+  <p>প্রতিটি channel-এর গুরুত্ব শেখে। Squeeze (GAP) → Excitation (FC) → Scale।</p>
+  <div class="formula-box">
+    $$\text{SE}(X) = X \odot \sigma(W_2 \cdot \text{ReLU}(W_1 \cdot \text{GAP}(X)))$$
+  </div>
+<pre><code><span class="kw">class</span> <span class="cls">SEBlock</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, c, r=<span class="num">16</span>):
+        <span class="fn">super</span>().__init__()
+        self.fc = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">AdaptiveAvgPool2d</span>(<span class="num">1</span>),
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Linear</span>(c, c//r), nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(c//r, c), nn.<span class="fn">Sigmoid</span>()
+        )
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        w = self.<span class="fn">fc</span>(x).<span class="fn">view</span>(x.size(<span class="num">0</span>),x.size(<span class="num">1</span>),<span class="num">1</span>,<span class="num">1</span>)
+        <span class="kw">return</span> x * w</code></pre>
+
+  <h3>Spatial Attention</h3>
+  <p>প্রতিটি spatial location-এর গুরুত্ব শেখে (channel dimension-এ pool করে)।</p>
+
+  <h3>CBAM (Convolutional Block Attention Module)</h3>
+  <p>Channel + Spatial attention একসাথে। প্রথমে channel, তারপর spatial attention apply করে।</p>
+  <div class="formula-box">$$X' = \text{SpatialAttn}(\text{ChannelAttn}(X)) \odot X$$</div>
+
+  </div>
+</section>
+
+<section class="section" id="transformer">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🤖 Transformer Architectures</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Positional Encoding</h3>
+  <p>Transformer-এ recurrence নেই, তাই position information আলাদাভাবে যোগ করতে হয়।</p>
+  <div class="formula-box">
+    $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)$$
+    <p>\(pos\)=position, \(i\)=dimension index। sinusoidal functions ভিন্ন ভিন্ন frequency-তে encode করে।</p>
+  </div>
+<pre><code><span class="kw">class</span> <span class="cls">PosEnc</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d, max_len=<span class="num">5000</span>):
+        <span class="fn">super</span>().__init__()
+        pe = torch.<span class="fn">zeros</span>(max_len, d)
+        pos = torch.<span class="fn">arange</span>(max_len).<span class="fn">unsqueeze</span>(<span class="num">1</span>)
+        div = torch.<span class="fn">exp</span>(torch.<span class="fn">arange</span>(<span class="num">0</span>,d,<span class="num">2</span>) * (-<span class="fn">math.log</span>(<span class="num">10000</span>)/d))
+        pe[:, <span class="num">0</span>::<span class="num">2</span>] = torch.<span class="fn">sin</span>(pos * div)
+        pe[:, <span class="num">1</span>::<span class="num">2</span>] = torch.<span class="fn">cos</span>(pos * div)
+        self.<span class="fn">register_buffer</span>(<span class="str">'pe'</span>, pe.<span class="fn">unsqueeze</span>(<span class="num">0</span>))
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x): <span class="kw">return</span> x + self.pe[:, :x.size(<span class="num">1</span>)]</code></pre>
+
+  <h3>Vision Transformer (ViT)</h3>
+  <p>Image-কে patches-এ ভাগ করে, প্রতিটি patch-কে embedding-এ convert করে, তারপর Transformer encoder-এ পাঠায়। CNN ছাড়াই SOTA।</p>
+  <div class="formula-box">
+    $$[x_{\text{class}}; x_p^1 E; x_p^2 E; \dots] + E_{\text{pos}}$$
+    <p>\(x_p^i\) = patch, \(E\) = patch embedding matrix, \([x_{\text{class}}]\) = classification token।</p>
+  </div>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">class</span> <span class="cls">ViT</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, img_size=<span class="num">224</span>, patch=<span class="num">16</span>, d=<span class="num">768</span>, n_classes=<span class="num">1000</span>):
+        <span class="fn">super</span>().__init__()
+        self.patch_embed = nn.<span class="fn">Conv2d</span>(<span class="num">3</span>, d, patch, stride=patch)
+        n = (img_size//patch)**<span class="num">2</span>
+        self.cls = nn.<span class="fn">Parameter</span>(torch.<span class="fn">randn</span>(<span class="num">1</span>,<span class="num">1</span>,d))
+        self.pos = nn.<span class="fn">Parameter</span>(torch.<span class="fn">randn</span>(<span class="num">1</span>, n+<span class="num">1</span>, d))
+        self.encoder = nn.<span class="fn">TransformerEncoder</span>(
+            nn.<span class="fn">TransformerEncoderLayer</span>(d, <span class="num">8</span>, d*<span class="num">4</span>, batch_first=<span class="kw">True</span>), <span class="num">12</span>)
+        self.head = nn.<span class="fn">Linear</span>(d, n_classes)
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.<span class="fn">patch_embed</span>(x).<span class="fn">flatten</span>(<span class="num">2</span>).<span class="fn">transpose</span>(<span class="num">1</span>,<span class="num">2</span>)
+        cls = self.cls.<span class="fn">expand</span>(x.size(<span class="num">0</span>),-<span class="num">1</span>,-<span class="num">1</span>)
+        x = torch.<span class="fn">cat</span>([cls, x], dim=<span class="num">1</span>) + self.pos
+        x = self.<span class="fn">encoder</span>(x)
+        <span class="kw">return</span> self.<span class="fn">head</span>(x[:, <span class="num">0</span>])</code></pre>
+
+  <h3>Swin Transformer</h3>
+  <p>Shifted window attention — local window-এ attention, window-গুলো shift করে global context। Linear complexity \(O(n)\)। Hierarchical feature map (multi-scale)।</p>
+
+  </div>
+</section>
+
+<!-- ================= POINT CLOUD ================= -->
+<section class="section" id="pc-fund">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>☁️ Point Cloud Fundamentals</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <p>Point cloud = 3D points-এর সেট \(\{(x_i, y_i, z_i, f_i)\}\), যেখানে \(f_i\) features (color, normal)। Unordered, irregular।</p>
+
+  <h3>KNN Graph</h3>
+  <p>প্রতিটি point-এর নিকটতম k neighbors খুঁজে graph তৈরি করে।</p>
+<pre><code><span class="kw">from</span> torch_geometric.nn <span class="kw">import</span> knn_graph
+edge_index = <span class="fn">knn_graph</span>(pos, k=<span class="num">20</span>, batch=batch)</code></pre>
+
+  <h3>Radius Graph</h3>
+  <p>নির্দিষ্ট radius-এর মধ্যে সব neighbor নেয়।</p>
+<pre><code><span class="kw">from</span> torch_geometric.nn <span class="kw">import</span> radius_graph
+edge_index = <span class="fn">radius_graph</span>(pos, r=<span class="num">0.1</span>, batch=batch)</code></pre>
+
+  <h3>Dynamic Graph</h3>
+  <p>প্রতি layer-এ feature-এর উপর ভিত্তি করে graph পুনরায় তৈরি করে (DGCNN)।</p>
+
+  </div>
+</section>
+
+<section class="section" id="pointnet">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>📐 PointNet Family</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Shared MLP</h3>
+  <p>প্রতিটি point-এ একই MLP apply করে (point-wise, permutation-invariant)। Conv1d দিয়ে implement হয়।</p>
+<pre><code>mlp = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Conv1d</span>(<span class="num">3</span>,<span class="num">64</span>,<span class="num">1</span>), nn.<span class="fn">BatchNorm1d</span>(<span class="num">64</span>), nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Conv1d</span>(<span class="num">64</span>,<span class="num">128</span>,<span class="num">1</span>), nn.<span class="fn">BatchNorm1d</span>(<span class="num">128</span>), nn.<span class="fn">ReLU</span>(),
+    nn.<span class="fn">Conv1d</span>(<span class="num">128</span>,<span class="num">1024</span>,<span class="num">1</span>)
+)</code></pre>
+
+  <h3>T-Net (Transform Network)</h3>
+  <p>Input points-এর জন্য alignment matrix (3×3) predict করে। Rotation/translation invariant করে।</p>
+  <div class="formula-box">$$x_i' = T(x_i), \quad T \in \mathbb{R}^{3\times 3} \text{ (orthogonal)}$$</div>
+
+  <h3>PointNet Encoder</h3>
+  <p>Input Transform → Shared MLP → Max Pool → Global Feature।</p>
+  <div class="formula-box">
+    $$f = \text{MAX}(\{h_\gamma(x_i)\}), \quad h_\gamma = \text{MLP}$$
+    <p>Max pooling permutation-invariant global feature দেয়।</p>
+  </div>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">class</span> <span class="cls">PointNet</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, k=<span class="num">40</span>):
+        <span class="fn">super</span>().__init__()
+        self.conv1 = nn.<span class="fn">Conv1d</span>(<span class="num">3</span>,<span class="num">64</span>,<span class="num">1</span>)
+        self.conv2 = nn.<span class="fn">Conv1d</span>(<span class="num">64</span>,<span class="num">128</span>,<span class="num">1</span>)
+        self.conv3 = nn.<span class="fn">Conv1d</span>(<span class="num">128</span>,<span class="num">1024</span>,<span class="num">1</span>)
+        self.bn1, self.bn2, self.bn3 = nn.<span class="fn">BatchNorm1d</span>(<span class="num">64</span>), nn.<span class="fn">BatchNorm1d</span>(<span class="num">128</span>), nn.<span class="fn">BatchNorm1d</span>(<span class="num">1024</span>)
+        self.fc = nn.<span class="fn">Sequential</span>(nn.<span class="fn">Linear</span>(<span class="num">1024</span>,<span class="num">512</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">Dropout</span>(<span class="num">0.3</span>),
+                                 nn.<span class="fn">Linear</span>(<span class="num">512</span>,<span class="num">256</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">Dropout</span>(<span class="num">0.3</span>),
+                                 nn.<span class="fn">Linear</span>(<span class="num">256</span>, k))
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):          <span class="cm"># x: (B, 3, N)</span>
+        x = F.<span class="fn">relu</span>(self.<span class="fn">bn1</span>(self.<span class="fn">conv1</span>(x)))
+        x = F.<span class="fn">relu</span>(self.<span class="fn">bn2</span>(self.<span class="fn">conv2</span>(x)))
+        x = self.<span class="fn">bn3</span>(self.<span class="fn">conv3</span>(x))
+        x, _ = x.<span class="fn">max</span>(dim=-<span class="num">1</span>)       <span class="cm"># global feature</span>
+        <span class="kw">return</span> self.<span class="fn">fc</span>(x)</code></pre>
+
+  <h3>PointNet++ (Set Abstraction)</h3>
+  <p>Local region-এ PointNet apply করে hierarchical feature শেখে। FPS (Farthest Point Sampling) + Ball query + PointNet।</p>
+  <div class="formula-box">
+    $$\text{SA}: (N, d+F) \to (N', d+F')$$
+    <p>Sampling (FPS) → Grouping (ball query) → PointNet (local feature)।</p>
+  </div>
+
+  <h3>Feature Propagation (Decoder)</h3>
+  <p>Encoder-এর downsampled feature-কে upsample করে skip connection-এর সাথে combine করে (segmentation-এর জন্য)। Three nearest neighbor interpolation।</p>
+
+  <h3>PointNeXT</h3>
+  <p>PointNet++-এর উন্নত সংস্করণ — inverted residual, better sampling, larger model।</p>
+
+  <h3>PointMAE</h3>
+  <p>Masked Autoencoder — random points mask করে reconstruct করতে শেখে। Self-supervised pretraining।</p>
+
+  </div>
+</section>
+
+<section class="section" id="dgcnn">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🔗 DGCNN & EdgeConv</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>EdgeConv</h3>
+  <p>প্রতিটি edge (point pair)-এর উপর MLP apply করে। Local geometry + global context capture করে।</p>
+  <div class="formula-box">
+    $$x_i' = \max_{j \in \mathcal{N}(i)} h_\Theta(x_i, x_j - x_i)$$
+    <p>\(h_\Theta\) = MLP, \(\mathcal{N}(i)\) = k-nearest neighbors।</p>
+  </div>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><code><span class="kw">class</span> <span class="cls">EdgeConv</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, in_c, out_c):
+        <span class="fn">super</span>().__init__()
+        self.mlp = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Conv2d</span>(in_c*<span class="num">2</span>, out_c, <span class="num">1</span>), nn.<span class="fn">BatchNorm2d</span>(out_c), nn.<span class="fn">ReLU</span>())
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x, edge_index):
+        <span class="cm"># x: (B, C, N), edge_index: (2, E)</span>
+        i, j = edge_index
+        x_i, x_j = x[:,:,i], x[:,:,j]
+        edge_feat = torch.<span class="fn">cat</span>([x_i, x_j - x_i], dim=<span class="num">1</span>)  <span class="cm"># (B, 2C, E)</span>
+        edge_feat = self.<span class="fn">mlp</span>(edge_feat.<span class="fn">unsqueeze</span>(-<span class="num">1</span>)).<span class="fn">squeeze</span>(-<span class="num">1</span>)
+        <span class="cm"># max pool over neighbors</span>
+        out = torch.<span class="fn">zeros_like</span>(x)
+        out.<span class="fn">scatter_add_</span>(<span class="num">2</span>, i.<span class="fn">unsqueeze</span>(<span class="num">0</span>).<span class="fn">unsqueeze</span>(<span class="num">0</span>).<span class="fn">expand_as</span>(edge_feat), edge_feat)
+        <span class="kw">return</span> out</code></pre>
+
+  <h3>DGCNN</h3>
+  <p>4টি EdgeConv block stacked। প্রতিটি block-এ feature space-এ KNN graph dynamically rebuild হয়।</p>
+
+  </div>
+</section>
+
+<section class="section" id="pc-adv">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🚀 Advanced Point Cloud</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Point Transformer</h3>
+  <p>Point-এর উপর self-attention। Vector attention ব্যবহার করে (scalar নয়)।</p>
+  <div class="formula-box">
+    $$y_i = \sum_{j \in \mathcal{N}(i)} \text{softmax}(\gamma(Q_i - K_j + \delta)) \odot (V_j + \delta)$$
+    <p>\(\delta = \text{MLP}(x_i - x_j)\) — relative position encoding।</p>
+  </div>
+
+  <h3>KPConv (Kernel Point Convolution)</h3>
+  <p>Kernel points-এর সেট দিয়ে 3D convolution define করে। Rigid + Deformable kernel points।</p>
+
+  </div>
+</section>
+
+<!-- ================= GNN ================= -->
+<section class="section" id="gnn">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🕸️ Graph Neural Networks</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Message Passing</h3>
+  <p>GNN-এর মূল প্রিন্সিপাল। প্রতিটি node তার neighbor-দের থেকে message collect করে নিজের feature update করে।</p>
+  <div class="formula-box">
+    $$m_i^{(l)} = \text{AGG}(\{h_j^{(l-1)} : j \in \mathcal{N}(i)\}), \quad h_i^{(l)} = \text{UPDATE}(h_i^{(l-1)}, m_i^{(l)})$$
+  </div>
+
+  <h3>GCN (Graph Convolutional Network)</h3>
+  <p>Spectral graph theory থেকে। Normalized adjacency দিয়ে neighbor features average করে।</p>
+  <div class="formula-box">
+    $$H^{(l+1)} = \sigma(\tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} W^{(l)})$$
+    <table class="symbol-table">
+      <tr><td>\(\tilde{A} = A + I\)</td><td>Self-loop যোগ করা adjacency</td></tr>
+      <tr><td>\(\tilde{D}\)</td><td>Degree matrix of \(\tilde{A}\)</td></tr>
+      <tr><td>\(H^{(l)}\)</td><td>Layer l-এর node features</td></tr>
+    </table>
+  </div>
+<pre><code><span class="kw">from</span> torch_geometric.nn <span class="kw">import</span> GCNConv
+<span class="kw">class</span> <span class="cls">GCN</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().__init__()
+        self.c1 = <span class="fn">GCNConv</span>(<span class="num">16</span>, <span class="num">32</span>)
+        self.c2 = <span class="fn">GCNConv</span>(<span class="num">32</span>, <span class="num">7</span>)
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x, edge):
+        x = F.<span class="fn">relu</span>(self.<span class="fn">c1</span>(x, edge))
+        x = F.<span class="fn">dropout</span>(x, p=<span class="num">0.5</span>, training=self.training)
+        <span class="kw">return</span> self.<span class="fn">c2</span>(x, edge)</code></pre>
+
+  <h3>GraphSAGE</h3>
+  <p>Sample + Aggregate। Large graph-এ scalable। Mean/LSTM/Pool aggregator।</p>
+  <div class="formula-box">
+    $$h_i^{(l)} = \sigma\left(W \cdot \text{CONCAT}(h_i^{(l-1)}, \text{AGG}(\{h_j^{(l-1)}\}))\right)$$
+  </div>
+<pre><code><span class="kw">from</span> torch_geometric.nn <span class="kw">import</span> SAGEConv
+conv = <span class="fn">SAGEConv</span>(in_channels, out_channels)</code></pre>
+
+  <h3>GAT (Graph Attention Network)</h3>
+  <p>Neighbor-দের attention weight দিয়ে weight করে। Important neighbor-কে বেশি গুরুত্ব।</p>
+  <div class="formula-box">
+    $$\alpha_{ij} = \text{softmax}_j\left(\text{LeakyReLU}(a^T [Wh_i \| Wh_j])\right)$$
+    $$h_i' = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} W h_j\right)$$
+  </div>
+<pre><code><span class="kw">from</span> torch_geometric.nn <span class="kw">import</span> GATConv
+conv = <span class="fn">GATConv</span>(in_channels, out_channels, heads=<span class="num">8</span>)</code></pre>
+
+  <h3>Graph Transformer</h3>
+  <p>Global attention সব node-এর মধ্যে (fully connected graph)। Positional encoding (Laplacian eigenvectors) যোগ করে।</p>
+
+  <h3>GIN (Graph Isomorphism Network)</h3>
+  <p>Weisfeiler-Lehman test-এর সমতুল্য expressive power।</p>
+  <div class="formula-box">
+    $$h_i^{(l)} = \text{MLP}\left((1+\epsilon^{(l)}) h_i^{(l-1)} + \sum_{j \in \mathcal{N}(i)} h_j^{(l-1)}\right)$$
+    <p>\(\epsilon\) শেখা যায় বা fixed।</p>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= TRAINING ================= -->
+<section class="section" id="loss">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>📉 Loss Functions</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>MSE (Mean Squared Error)</h3>
+  <div class="formula-box">
+    $$\text{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \hat{y}_i)^2$$
+    <p>Regression-এ ব্যবহৃত। <b>Range:</b> \([0, \infty)\)। Outlier-এ সংবেদনশীল (বর্গের কারণে)।</p>
+  </div>
+<pre><code>criterion = nn.<span class="fn">MSELoss</span>()</code></pre>
+
+  <h3>MAE (Mean Absolute Error / L1)</h3>
+  <div class="formula-box">
+    $$\text{MAE} = \frac{1}{n}\sum_{i=1}^n |y_i - \hat{y}_i|$$
+    <p><b>Range:</b> \([0, \infty)\)। Robust to outliers।</p>
+  </div>
+
+  <h3>Huber Loss (Smooth L1)</h3>
+  <div class="formula-box">
+    $$L_\delta = \begin{cases} \frac{1}{2}(y-\hat{y})^2 & |y-\hat{y}| \le \delta \\ \delta|y-\hat{y}| - \frac{1}{2}\delta^2 & \text{otherwise} \end{cases}$$
+    <p>MSE ও MAE-এর মিশ্রণ। ছোট error-এ MSE, বড় error-এ MAE।</p>
+  </div>
+
+  <h3>Cross Entropy Loss</h3>
+  <div class="formula-box">
+    $$\text{CE} = -\sum_{c=1}^C y_c \log(\hat{y}_c)$$
+    <p>Classification-এ standard। PyTorch-এ softmax internally apply হয়।</p>
+  </div>
+<pre><code>criterion = nn.<span class="fn">CrossEntropyLoss</span>()  <span class="cm"># input: raw logits, target: class index</span></code></pre>
+
+  <h3>Focal Loss</h3>
+  <p>Class imbalance সমস্যা সমাধান করে। Easy example-এর weight কমায়।</p>
+  <div class="formula-box">
+    $$\text{FL}(p_t) = -\alpha_t (1-p_t)^\gamma \log(p_t)$$
+    <table class="symbol-table">
+      <tr><td>\(p_t\)</td><td>সঠিক class-এর predicted probability</td></tr>
+      <tr><td>\(\gamma\)</td><td>Focusing parameter (সাধারণত 2)</td></tr>
+      <tr><td>\(\alpha_t\)</td><td>Class weight</td></tr>
+    </table>
+  </div>
+<pre><code><span class="kw">class</span> <span class="cls">FocalLoss</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, gamma=<span class="num">2</span>, alpha=<span class="kw">None</span>):
+        <span class="fn">super</span>().__init__()
+        self.gamma, self.alpha = gamma, alpha
+    <span class="kw">def</span> <span class="fn">forward</span>(self, inp, tgt):
+        ce = F.<span class="fn">cross_entropy</span>(inp, tgt, reduction=<span class="str">'none'</span>)
+        pt = torch.<span class="fn">exp</span>(-ce)
+        loss = ((<span class="num">1</span>-pt)**self.gamma * ce)
+        <span class="kw">return</span> loss.<span class="fn">mean</span>() <span class="kw">if</span> self.alpha <span class="kw">is</span> <span class="kw">None</span> <span class="kw">else</span> (self.alpha*loss).<span class="fn">mean</span>()</code></pre>
+
+  </div>
+</section>
+
+<section class="section" id="optim">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>⚙️ Optimizers</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>SGD (Stochastic Gradient Descent)</h3>
+  <div class="formula-box">
+    $$w \leftarrow w - \eta \nabla L(w)$$
+    <p>Momentum যোগ করলে: \(v_t = \mu v_{t-1} + \nabla L, \quad w \leftarrow w - \eta v_t\)</p>
+    <table class="symbol-table">
+      <tr><td>\(\eta\)</td><td>Learning rate (সাধারণত 0.01-0.1)</td></tr>
+      <tr><td>\(\mu\)</td><td>Momentum (সাধারণত 0.9)</td></tr>
+    </table>
+  </div>
+<pre><code>optim = torch.optim.<span class="fn">SGD</span>(model.<span class="fn">parameters</span>(), lr=<span class="num">0.01</span>, momentum=<span class="num">0.9</span>)</code></pre>
+
+  <h3>Adam</h3>
+  <p>First moment (mean) ও second moment (variance) of gradient track করে। Adaptive learning rate।</p>
+  <div class="formula-box">
+    $$m_t = \beta_1 m_{t-1} + (1-\beta_1)g_t, \quad v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2$$
+    $$\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1-\beta_2^t}$$
+    $$w \leftarrow w - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+    <table class="symbol-table">
+      <tr><td>\(\beta_1\)</td><td>0.9 (default)</td></tr>
+      <tr><td>\(\beta_2\)</td><td>0.999 (default)</td></tr>
+      <tr><td>\(\epsilon\)</td><td>1e-8</td></tr>
+      <tr><td>\(\eta\)</td><td>সাধারণত 1e-3</td></tr>
+    </table>
+  </div>
+<pre><code>optim = torch.optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="num">1e-3</span>)</code></pre>
+
+  <h3>AdamW</h3>
+  <p>Adam + decoupled weight decay। Transformer-এ standard। Weight decay সরাসরি weight-এ apply হয়, gradient-এ নয়।</p>
+<pre><code>optim = torch.optim.<span class="fn">AdamW</span>(model.<span class="fn">parameters</span>(), lr=<span class="num">1e-3</span>, weight_decay=<span class="num">0.01</span>)</code></pre>
+
+  </div>
+</section>
+
+<section class="section" id="sched">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>📈 Learning Rate Scheduling</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>StepLR</h3>
+  <p>প্রতি step_size epoch-এ LR-কে gamma দিয়ে গুণ করে।</p>
+  <div class="formula-box">$$\eta_t = \eta_0 \cdot \gamma^{\lfloor t/\text{step\_size} \rfloor}$$</div>
+<pre><code>sched = torch.optim.lr_scheduler.<span class="fn">StepLR</span>(optim, step_size=<span class="num">30</span>, gamma=<span class="num">0.1</span>)</code></pre>
+
+  <h3>Cosine Annealing</h3>
+  <p>LR cosine curve অনুযায়ী কমতে থাকে, মাঝে মাঝে warm restart।</p>
+  <div class="formula-box">$$\eta_t = \eta_{min} + \frac{1}{2}(\eta_{max} - \eta_{min})(1 + \cos(\frac{t}{T}\pi))$$</div>
+<pre><code>sched = torch.optim.lr_scheduler.<span class="fn">CosineAnnealingLR</span>(optim, T_max=<span class="num">100</span>)</code></pre>
+
+  <h3>ReduceLROnPlateau</h3>
+  <p>Metric (যেমন val_loss) improve না হলে LR কমায়।</p>
+<pre><code>sched = torch.optim.lr_scheduler.<span class="fn">ReduceLROnPlateau</span>(optim, mode=<span class="str">'min'</span>, factor=<span class="num">0.5</span>, patience=<span class="num">5</span>)
+sched.<span class="fn">step</span>(val_loss)</code></pre>
+
+  </div>
+</section>
+
+<section class="section" id="aug">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🎨 Data Augmentation</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <h3>Image Augmentation</h3>
+  <ul>
+    <li><b>Geometric:</b> RandomHorizontalFlip, RandomRotation, RandomCrop, Resize</li>
+    <li><b>Color:</b> ColorJitter (brightness, contrast, saturation), RandomGrayscale</li>
+    <li><b>Advanced:</b> Cutout, Mixup, CutMix, RandAugment</li>
+  </ul>
+<pre><code><span class="kw">from</span> torchvision <span class="kw">import</span> transforms
+tfm = transforms.<span class="fn">Compose</span>([
+    transforms.<span class="fn">RandomHorizontalFlip</span>(),
+    transforms.<span class="fn">RandomRotation</span>(<span class="num">15</span>),
+    transforms.<span class="fn">ColorJitter</span>(<span class="num">0.2</span>,<span class="num">0.2</span>,<span class="num">0.2</span>),
+    transforms.<span class="fn">ToTensor</span>(),
+    transforms.<span class="fn">Normalize</span>((<span class="num">0.5</span>,)*<span class="num">3</span>, (<span class="num">0.5</span>,)*<span class="num">3</span>)
+])</code></pre>
+
+  <h3>Point Cloud Augmentation</h3>
+  <ul>
+    <li><b>Rotation:</b> Random rotation around Z-axis (বা XYZ)</li>
+    <li><b>Scaling:</b> Random scale (0.8-1.2)</li>
+    <li><b>Translation:</b> Small random shift</li>
+    <li><b>Jitter:</b> Gaussian noise যোগ</li>
+    <li><b>Random dropout:</b> কিছু point বাদ</li>
+  </ul>
+<pre><code><span class="kw">def</span> <span class="fn">augment_pc</span>(pts):
+    <span class="cm"># Random rotation Z-axis</span>
+    theta = torch.<span class="fn">rand</span>(<span class="num">1</span>) * <span class="num">2</span> * <span class="fn">math.pi</span>
+    R = torch.<span class="fn">tensor</span>([[torch.cos(theta), -torch.sin(theta), <span class="num">0</span>],
+                      [torch.sin(theta),  torch.cos(theta), <span class="num">0</span>],
+                      [<span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>]])
+    pts = pts @ R.T
+    <span class="cm"># Jitter</span>
+    pts += torch.<span class="fn">randn_like</span>(pts) * <span class="num">0.01</span>
+    <span class="kw">return</span> pts</code></pre>
+
+  </div>
+</section>
+
+<!-- ================= FINAL PRACTICE ================= -->
+<section class="section">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    <h2>🎯 Final Practice Tasks</h2><span class="toggle">▾</span>
+  </div>
+  <div class="section-body">
+
+  <div class="practice">
+    <h5>Task 1: ResNet Block গণনা</h5>
+    <p>একটি ResNet basic block-এ দুটি 3×3 Conv (64→64) আছে। মোট কত প্যারামিটার? (Bias সহ)</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p>প্রতিটি Conv: \(3\times3\times64\times64 + 64 = 36928\)। দুটি Conv = 73856। দুটি BatchNorm: \(2\times(64+64) = 256\)। মোট ≈ 74112।</p>
+    </div>
+  </div>
+
+  <div class="practice">
+    <h5>Task 2: Attention Shape</h5>
+    <p>Batch=8, seq_len=128, d_model=512, heads=8 হলে attention matrix-এর shape কত?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p>প্রতি head-এ \(d_k = 512/8 = 64\)। Attention matrix shape: \((B, h, L, L) = (8, 8, 128, 128)\)।</p>
+    </div>
+  </div>
+
+  <div class="practice">
+    <h5>Task 3: Conv Output Size</h5>
+    <p>Input 32×32, kernel 5×5, stride 2, padding 1 হলে output size?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p>\(O = \lfloor\frac{32 - 5 + 2\times1}{2}\rfloor + 1 = \lfloor\frac{29}{2}\rfloor + 1 = 14 + 1 = 15\)। Output: 15×15।</p>
+    </div>
+  </div>
+
+  <div class="practice">
+    <h5>Task 4: Cross-Entropy গণনা</h5>
+    <p>Logits = [2, 1, 0.1], target = 0 হলে CE loss কত?</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+      <p>Softmax: \(e^2=7.389, e^1=2.718, e^{0.1}=1.105\), sum=11.212। \(p_0 = 7.389/11.212 = 0.659\)। \(\text{CE} = -\log(0.659) = 0.417\)।</p>
+    </div>
+  </div>
+
+  <div class="practice">
+    <h5>Task 5: Complete Training Loop</h5>
+    <p>MNIST-এর জন্য একটি full training loop লিখুন (MLP, Adam, CosineAnnealing, Early stopping)।</p>
+    <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show')">উত্তর দেখুন</button>
+    <div class="answer">
+<pre><code>model = nn.Sequential(nn.Flatten(), nn.Linear(784,256), nn.ReLU(),
+                      nn.Linear(256,128), nn.ReLU(), nn.Linear(128,10))
+optim = torch.optim.Adam(model.parameters(), lr=1e-3)
+sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=20)
+crit = nn.CrossEntropyLoss()
+best_val, patience, counter = 1e9, 5, 0
+
+for epoch in range(20):
+    model.train()
+    for x,y in train_loader:
+        optim.zero_grad()
+        loss = crit(model(x), y)
+        loss.backward(); optim.step()
+    sched.step()
+
+    model.eval()
+    val_loss = sum(crit(model(x),y).item()*x.size(0) for x,y in val_loader) / len(val_ds)
+    if val_loss < best_val:
+        best_val = val_loss; counter = 0
+        torch.save(model.state_dict(), 'best.pt')
+    else:
+        counter += 1
+        if counter >= patience:
+            print(f"Early stop at epoch {epoch}"); break</code></pre>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<div class="info-box" style="margin-top:30px">
+  <b>🎓 শেষ কথা:</b> এই গাইডে Deep Learning-এর মূল building blocks থেকে advanced architecture পর্যন্ত সব কভার করা হয়েছে। প্রতিটি টপিকের কোড নিজে রান করে দেখুন, shapes print করে verify করুন, এবং practice tasks সমাধান করুন। শেখার সবচেয়ে ভালো উপায় হলো <b>implementation</b>!
+</div>
+
+</main>
+
+<script>
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent = '✓ Copied';
+    setTimeout(()=>btn.textContent='Copy', 1500);
+  });
+}
+// Re-render MathJax after expanding sections
+document.querySelectorAll('.section-header').forEach(h=>{
+  h.addEventListener('click', ()=>{
+    setTimeout(()=>{ if(window.MathJax) MathJax.typeset(); }, 100);
+  });
+});
+</script>
+
+</body>
+</html>
