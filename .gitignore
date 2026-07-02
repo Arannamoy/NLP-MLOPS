@@ -32,3 +32,5 @@ sample_data
 sample_data_2
 synthetic_piles_data
 *.las
+test
+*.csv
