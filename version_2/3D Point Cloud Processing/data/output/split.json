@@ -1,0 +1,53 @@
+{
+  "test": [
+    "data/train/sample_data_0045.las",
+    "data/train/sample_data_0032.las",
+    "data/train/sample_data_0033.las",
+    "data/train/sample_data_008.las",
+    "data/train/sample_data_0041.las",
+    "data/train/sample_data_006.las",
+    "data/train/sample_data_0013.las"
+  ],
+  "val": [
+    "data/train/sample_data_0020.las",
+    "data/train/sample_data_0017.las",
+    "data/train/sample_data_0012.las",
+    "data/train/sample_data_0015.las",
+    "data/train/sample_data_0031.las",
+    "data/train/sample_data_0039.las",
+    "data/train/sample_data_0027.las"
+  ],
+  "train": [
+    "data/train/sample_data_0025.las",
+    "data/train/sample_data_0021.las",
+    "data/train/sample_data_007.las",
+    "data/train/sample_data_0023.las",
+    "data/train/sample_data_0018.las",
+    "data/train/sample_data_0024.las",
+    "data/train/sample_data_0043.las",
+    "data/train/sample_data_0038.las",
+    "data/train/sample_data_0034.las",
+    "data/train/sample_data_001.las",
+    "data/train/sample_data_0037.las",
+    "data/train/sample_data_0036.las",
+    "data/train/sample_data_0014.las",
+    "data/train/sample_data_002.las",
+    "data/train/sample_data_004.las",
+    "data/train/sample_data_0010.las",
+    "data/train/sample_data_005.las",
+    "data/train/sample_data_0029.las",
+    "data/train/sample_data_0011.las",
+    "data/train/sample_data_0040.las",
+    "data/train/sample_data_0030.las",
+    "data/train/sample_data_0042.las",
+    "data/train/sample_data_0019.las",
+    "data/train/sample_data_003.las",
+    "data/train/sample_data_0026.las",
+    "data/train/sample_data_009.las",
+    "data/train/sample_data_0028.las",
+    "data/train/sample_data_0016.las",
+    "data/train/sample_data_0022.las",
+    "data/train/sample_data_0035.las",
+    "data/train/sample_data_0044.las"
+  ]
+}
