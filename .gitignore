@@ -34,3 +34,8 @@ synthetic_piles_data
 *.las
 test
 *.csv
+data
+mlflow
+mlfow
+checkpoints
+catboost_info
