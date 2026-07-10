@@ -4,7 +4,7 @@ import os, io, numpy as np, streamlit as st
 import plotly.graph_objects as go
 import laspy, joblib
 
-MODEL_PATH   = "checkpoints/PointTransformerV2_epoch_0090.pth"
+MODEL_PATH   = "checkpoints/PointTransformerV2_best.pth"
 TARGET_CLASS = 1      
 NUM_POINTS   = 4096   
 
@@ -315,7 +315,7 @@ c1, c2, c3 = st.columns(3)
 max_pts = c1.slider("Max display points",
                     20_000, 300_000, 100_000, 10_000)
 pt_size = c2.slider("Point size", 1, 6, 2)
-vis_mode = c3.radio("Visualization", ["Plotly (browser)", "Open3D (window)"],
+vis_mode = c3.radio("Visualization", [ "Open3D (window)","Plotly (browser)"],
                     horizontal=True)
 
 run_btn = st.button("▶  Run Segmentation", type="primary",
