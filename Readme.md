@@ -10,6 +10,8 @@
     - [All Installed Package](#all-install-package)
     - [All Upgrade Package](#all-upgrade-package)
     - [MOK reset](#mok-reset)
+    - [PyTorch + PyG Installation](#-install-pytorch-geometric-dependencies)
+    - [Ubuntu Storage & Maintenance Cheatsheet](#-ubuntu-storage--maintenance-cheatsheet)
 - ML
     - Online resources. Colah's blog
     - [Confusion Matrix](#confusion-matrix)
@@ -2154,4 +2156,242 @@ Then:
 
 
 
+# 🐧 Ubuntu Storage & Maintenance Cheatsheet
 
+## 💾 Check Disk Usage
+
+### Filesystem usage
+```bash
+df -h
+```
+
+### Largest directories (whole system)
+```bash
+sudo du -xh / | sort -rh | head -100
+```
+
+### Largest directories (home)
+```bash
+du -xh ~ | sort -rh | head -100
+```
+
+### Largest files (whole system)
+```bash
+sudo find / -type f -printf '%s\t%p\n' 2>/dev/null | sort -nr | head -100 | numfmt --field=1 --to=iec-i --suffix=B
+```
+
+### Largest files (home)
+```bash
+find ~ -type f -printf '%s\t%p\n' | sort -nr | head -100 | numfmt --field=1 --to=iec-i --suffix=B
+```
+
+---
+
+# 📦 Package Cache Cleanup
+
+## pip cache
+```bash
+pip cache purge
+```
+
+## uv cache
+```bash
+uv cache clean
+```
+
+## Conda cache
+```bash
+conda clean --all -y
+```
+
+## APT cache
+```bash
+sudo apt clean
+```
+
+---
+
+# 📝 System Logs
+
+### Check log size
+```bash
+journalctl --disk-usage
+```
+
+### Keep only 200MB logs
+```bash
+sudo journalctl --vacuum-size=200M
+```
+
+### Keep last 7 days
+```bash
+sudo journalctl --vacuum-time=7d
+```
+
+---
+
+# 🐍 Conda
+
+### List environments
+```bash
+conda env list
+```
+
+### Remove environment
+```bash
+conda env remove -n ENV_NAME
+```
+
+### Package cache size
+```bash
+du -sh ~/anaconda3/pkgs
+```
+
+---
+
+# 🐳 Podman
+
+### Storage usage
+```bash
+podman system df
+```
+
+### Containers
+```bash
+podman ps -a
+```
+
+### Images
+```bash
+podman images
+```
+
+### Container sizes
+```bash
+podman ps -a --size
+```
+
+⚠️ Remove unused containers/images only if you don't need them:
+```bash
+podman system prune -a
+```
+
+---
+
+# 🌐 Browser Cache
+
+### Chrome cache
+```bash
+rm -rf ~/.cache/google-chrome/*
+```
+
+### Chromium cache
+```bash
+rm -rf ~/.cache/chromium/*
+```
+
+---
+
+# 🗑️ Trash
+
+### User Trash
+```bash
+gio trash --empty
+```
+
+### Size
+```bash
+du -sh ~/.local/share/Trash
+```
+
+---
+
+# 🧠 VS Code
+
+### Extensions
+```bash
+code --list-extensions
+```
+
+### Extension size
+```bash
+du -sh ~/.vscode/extensions
+```
+
+---
+
+# 🤖 LM Studio
+
+### Models
+```bash
+du -sh ~/.lmstudio
+```
+
+---
+
+# 🔍 Interactive Disk Analyzer
+
+Install:
+
+```bash
+sudo apt install ncdu
+```
+
+Run:
+
+```bash
+sudo ncdu /
+```
+
+or
+
+```bash
+ncdu ~
+```
+
+---
+
+# 📊 Quick Health Check
+
+```bash
+df -h
+journalctl --disk-usage
+du -sh ~/.cache
+du -sh ~/.local
+du -sh ~/anaconda3
+podman system df
+```
+
+# PyTorch + PyG Installation
+
+### 🧹 Remove existing PyTorch packages
+
+```bash
+pip uninstall -y torch torchvision torchaudio torch-scatter torch-cluster
+```
+
+### 🔥 Install PyTorch (CUDA 12.1)
+
+```bash
+pip install torch==2.5.1 torchvision torchaudio \
+  --index-url https://download.pytorch.org/whl/cu121
+```
+
+### 📦 Install PyTorch Geometric Dependencies
+
+```bash
+pip install torch-scatter torch-cluster \
+  -f https://data.pyg.org/whl/torch-2.5.1+cu121.html
+```
+
+### 📚 Install Additional Packages
+
+```bash
+pip install laspy tqdm
+```
+
+### ✅ Verify Installation
+
+```bash
+python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+```

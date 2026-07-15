@@ -17,7 +17,7 @@ from scipy.spatial import cKDTree
 from torch_cluster import knn as tc_knn
 from torch_scatter import scatter_softmax, scatter_add, scatter_max, scatter_mean
 
-MODEL_PATH   = "checkpoints/PointTransformerV2_best.pth"
+MODEL_PATH   = "checkpoints/PT_v2_sliding_window_10_channel/PointTransformerV2_best.pth"
 LAS_PATH     = sys.argv[1] if len(sys.argv) > 1 else "data/test/sample_data_0046.las"
 TARGET_CLASS = 1                      # 1 = wood powder, 0 = environment
 NUM_CLASSES  = 2

@@ -13,10 +13,41 @@ import numpy as np
 import gradio as gr
 import plotly.graph_objects as go
 
-from inference import (
+import multiprocessing as _mp
+
+from inference_standalone import (
     MODEL_PATH, TARGET_CLASS, NUM_CLASSES,
-    load_model, predict_full_cloud, visualize_segmentation,
+    load_model, predict_full_cloud,
 )
+
+# ── Open3D window in a SEPARATE PROCESS ──────────────────────────────────────
+# Gradio callbacks run in worker threads; Open3D/GLFW requires a main thread,
+# so calling draw_geometries directly from a callback hangs or crashes.
+# A child process gets its own main thread → window opens instantly and the
+# Plotly output renders in parallel, without blocking the UI.
+def _open3d_window(pts, preds, title):
+    import numpy as np, open3d as o3d
+    colors = np.zeros((len(pts), 3), dtype=np.float64)
+    colors[preds == TARGET_CLASS] = [0.0, 0.8, 0.0]
+    colors[preds != TARGET_CLASS] = [0.8, 0.0, 0.0]
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector((pts - pts.mean(axis=0)).astype(np.float64))
+    pcd.colors = o3d.utility.Vector3dVector(colors)
+    span = float((pts.max(0) - pts.min(0)).max()) * 0.5
+    axes = o3d.geometry.TriangleMesh.create_coordinate_frame(size=span)
+    n_t = int((preds == TARGET_CLASS).sum())
+    o3d.visualization.draw_geometries(
+        [pcd, axes],
+        window_name=f"{title} | green(target)={n_t:,} "
+                    f"({n_t / max(len(preds), 1) * 100:.1f}%) | "
+                    f"red(others)={len(preds) - n_t:,}",
+        width=1280, height=800)
+
+def show_open3d_async(pts, preds, title):
+    ctx = _mp.get_context("fork" if hasattr(_mp, "get_context") and
+                          "fork" in _mp.get_all_start_methods() else "spawn")
+    p = ctx.Process(target=_open3d_window, args=(pts, preds, title), daemon=True)
+    p.start()          # do NOT join — window lives independently of the UI
 
 # ── Model cache keyed on file-content hash (auto-reload when best.pth changes) ──
 _MODEL_CACHE = {"sha": None, "model": None, "n_pts": None}
@@ -110,8 +141,9 @@ def run_segmentation(las_file, max_pts, pt_size, open3d_window):
         stats += f"\n\n📏 GT labels found → **per-file mIoU = {np.mean(ious):.4f}**"
 
     if open3d_window:
-        visualize_segmentation(pts, preds,
-                               title=f"Segmentation | {os.path.basename(las_path)}")
+        show_open3d_async(pts, preds,
+                          title=f"Segmentation | {os.path.basename(las_path)}")
+        stats += "\n\n🪟 Open3D window opened on your desktop (separate process)."
 
     fig = make_figure(pts, preds, max_pts, pt_size)
     return fingerprint, stats, fig
@@ -129,8 +161,9 @@ with gr.Blocks(title="Point Cloud Segmentation") as demo:
             max_pts = gr.Slider(20_000, 300_000, value=100_000, step=10_000,
                                 label="Max display points")
             pt_size = gr.Slider(1, 6, value=2, step=1, label="Point size")
-            o3d_chk = gr.Checkbox(label="Also open Open3D desktop window",
-                                  value=False)
+            o3d_chk = gr.Checkbox(
+                label="Also open Open3D desktop window (alongside Plotly)",
+                value=False)
             run_btn = gr.Button("▶ Run Segmentation", variant="primary")
 
     fp_out    = gr.Markdown()
