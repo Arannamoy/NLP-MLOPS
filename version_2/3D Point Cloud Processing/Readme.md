@@ -24,7 +24,7 @@ python -m ipykernel install \
 ```
 
 ```txt
-!gdown --folder "https://drive.google.com/drive/folders/1fUCLmHNBI5gCP4w1Z-qA49Lkq4V_8xhC?usp=sharing"
+!gdown --folder "https://drive.google.com/drive/folders/1kIPiEuagMhtbkL_iLUtGgcHRN6M8ESKG?usp=sharing"
 ```
 
 

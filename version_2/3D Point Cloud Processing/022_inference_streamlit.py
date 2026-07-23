@@ -1,47 +1,55 @@
-# streamlit run inference.py
+# streamlit run 022_inference_streamlit.py
 # ─────────────────────────────────────────────────────────────────────────────
-# This app contains NO inference logic of its own. It imports load_model()
-# and predict_full_cloud() from inference.py — the script that is
-# verified to work. The uploaded file is written to disk and passed through
-# the EXACT same code path. Divergence between app and script is therefore
-# structurally impossible: same functions, same file, same model.
+# This app contains NO inference logic of its own. It imports load_model(),
+# predict_full_cloud(), visualize_segmentation(), and ARCH_BUILDERS from
+# inference.py — the shared, verified code path. The uploaded file is
+# written to disk and passed through the EXACT same functions used by the
+# CLI script. Divergence between app and script is structurally impossible.
+#
+# SYNCED with the multi-architecture inference.py (supports ptv2, kpconv,
+# randlanet, spt, pointnet2, pointnext — pick the architecture in the UI
+# that matches the checkpoint you upload/select).
 #
 # Requirement: inference.py must sit in the same folder.
 # ─────────────────────────────────────────────────────────────────────────────
-import os, io, time, hashlib, tempfile, datetime
+import os, time, hashlib, tempfile, datetime
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 
 from inference import (
-    MODEL_PATH, TARGET_CLASS, NUM_CLASSES,
-    load_model as load_ptv2_model,
+    TARGET_CLASS,
+    ARCH_BUILDERS,
+    load_model,
     predict_full_cloud,
+    visualize_segmentation,
 )
 
 st.set_page_config(page_title="Point Cloud Segmentation", layout="wide")
 st.title("🌲 Point Cloud Segmentation — Inference")
-st.caption(f"Model: `{MODEL_PATH}`  |  Target class: `{TARGET_CLASS}`  |  "
-           f"Engine: `inference.py` (shared code path)")
+st.caption("Engine: `inference.py` (shared code path) | "
+           f"Target class: `{TARGET_CLASS}` | "
+           f"Architectures: {', '.join(ARCH_BUILDERS.keys())}")
 
 
-# ── Model loading, cached on the FILE CONTENT hash ───────────────────────────
-def _model_file_sha():
-    if not os.path.exists(MODEL_PATH):
+# ── Model loading, cached on (file content hash, architecture) ───────────────
+def _model_file_sha(path):
+    if not path or not os.path.exists(path):
         return None
-    return hashlib.sha256(open(MODEL_PATH, "rb").read()).hexdigest()
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
 @st.cache_resource(show_spinner="Loading model…")
-def cached_model(model_sha):
-    """model_sha is part of the cache key → replacing best.pth on disk
-    automatically invalidates this cache. No stale models, ever."""
+def cached_model(model_sha, model_path, arch):
+    """model_sha + arch are part of the cache key → replacing the checkpoint
+    file on disk, OR switching architecture, automatically invalidates this
+    cache. No stale models, ever."""
     if model_sha is None:
-        return None, None, f"Model file not found: {MODEL_PATH}"
+        return None, None, None, None, None, f"Model file not found: {model_path}"
     try:
-        model, n_pts = load_ptv2_model(MODEL_PATH)   # standalone's loader
+        model, n_pts, in_ch, nc, flags = load_model(model_path, arch)
     except Exception as e:
-        return None, None, f"Model load failed: {e}"
-    return model, n_pts, None
+        return None, None, None, None, None, f"Model load failed: {e}"
+    return model, n_pts, in_ch, nc, flags, None
 
 
 # ── Plotly visualization (display only — no effect on predictions) ───────────
@@ -80,6 +88,13 @@ def make_figure(pts, preds, max_pts, pt_size):
 
 
 # ── UI ────────────────────────────────────────────────────────────────────────
+with st.sidebar:
+    st.header("Model")
+    arch = st.selectbox("Architecture", list(ARCH_BUILDERS.keys()))
+    model_path = st.text_input(
+        "Checkpoint path",
+        value="checkpoints/PointCloudDataset_SlidingWindow_9_channel/PointTransformerV2_best.pth")
+
 uploaded = st.file_uploader("Upload a `.las` / `.laz` file", type=["las", "laz"])
 
 c1, c2, c3 = st.columns(3)
@@ -92,15 +107,17 @@ run_btn = st.button("▶  Run Segmentation", type="primary",
                     disabled=(uploaded is None))
 
 if uploaded and run_btn:
-    # 1) model — cached on content hash, loaded by the standalone loader
-    model, n_pts, err = cached_model(_model_file_sha())
+    # 1) model — cached on (content hash, architecture)
+    sha = _model_file_sha(model_path)
+    model, n_pts, in_ch, nc, flags, err = cached_model(sha, model_path, arch)
     if err:
         st.error(f"❌ {err}")
         st.stop()
-    _mt = datetime.datetime.fromtimestamp(os.path.getmtime(MODEL_PATH))
-    st.caption(f"🔑 Model `{os.path.abspath(MODEL_PATH)}` | "
-               f"sha256 `{_model_file_sha()[:12]}` | modified {_mt:%Y-%m-%d %H:%M} | "
-               f"chunk size {n_pts:,}")
+    _mt = datetime.datetime.fromtimestamp(os.path.getmtime(model_path))
+    st.caption(f"🔑 Model `{os.path.abspath(model_path)}` | arch `{arch}` | "
+               f"sha256 `{sha[:12]}` | modified {_mt:%Y-%m-%d %H:%M} | "
+               f"in_channels={in_ch} | chunk size {n_pts:,}")
+    st.caption(f"Channel flags: {flags}")
 
     # 2) write the uploaded bytes to disk → the standalone path-based pipeline
     data = uploaded.getvalue()
@@ -112,12 +129,11 @@ if uploaded and run_btn:
         tmp.write(data)
         tmp_path = tmp.name
 
-    # 3) inference — EXACTLY the standalone function
+    # 3) inference — EXACTLY the shared function, same args the CLI script uses
     try:
         t0 = time.time()
-        with st.spinner("Running PTv2 inference (same code as "
-                        "inference.py)…"):
-            pts, preds, lbl = predict_full_cloud(model, tmp_path, n_pts)
+        with st.spinner(f"Running {arch} inference (same code as inference.py)…"):
+            pts, preds, lbl = predict_full_cloud(model, tmp_path, n_pts, in_ch, flags)
         st.caption(f"⏱️ Inference finished in {time.time() - t0:.1f}s")
     except Exception as e:
         st.error("❌ Inference failed — full traceback below.")
@@ -135,17 +151,20 @@ if uploaded and run_btn:
     m3.metric("🔴 Others",    f"{n_tot - n_tgt:,}")
     m4.metric("Target Ratio", f"{n_tgt / max(n_tot, 1) * 100:.2f}%")
 
-    # per-file mIoU if the uploaded file carries ground-truth labels
-    if np.unique(lbl).size > 1:
-        ious = []
-        for c in range(NUM_CLASSES):
-            tp = int(((lbl == c) & (preds == c)).sum())
-            fp = int(((lbl != c) & (preds == c)).sum())
-            fn = int(((lbl == c) & (preds != c)).sum())
-            if tp + fp + fn:
-                ious.append(tp / (tp + fp + fn))
-        st.info(f"📏 GT labels found in file → per-file mIoU = "
-                f"{float(np.mean(ious)):.4f}")
+    # per-file target-class IoU/Dice/Precision/Recall if the file carries GT labels
+    has_labels = lbl.any() or (lbl == 0).sum() < len(lbl)
+    if has_labels:
+        tp = int(((lbl == TARGET_CLASS) & (preds == TARGET_CLASS)).sum())
+        fp = int(((lbl != TARGET_CLASS) & (preds == TARGET_CLASS)).sum())
+        fn = int(((lbl == TARGET_CLASS) & (preds != TARGET_CLASS)).sum())
+        tn = int(((lbl != TARGET_CLASS) & (preds != TARGET_CLASS)).sum())
+        iou  = tp / (tp + fp + fn) if (tp + fp + fn) > 0 else 0.0
+        dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        st.info(f"📏 GT labels found → **target-class IoU = {iou:.4f}**  |  "
+               f"Dice = {dice:.4f}  |  Precision = {prec:.4f}  |  Recall = {rec:.4f}")
+        st.caption(f"TP={tp:,}  FP={fp:,}  FN={fn:,}  TN={tn:,}")
 
     # 5) visualize
     st.subheader("3D Segmentation Result")
@@ -156,11 +175,11 @@ if uploaded and run_btn:
         st.caption(f"Showing up to {max_pts:,} of {n_tot:,} points "
                    f"(inference ran on all {n_tot:,}).")
     else:
-        from inference import visualize_segmentation
         st.info("🪟 Opening Open3D window on your desktop… "
                 "Close the window to return here.")
         visualize_segmentation(pts, preds,
-                               title=f"Segmentation | {uploaded.name}")
+                               title=f"Segmentation | {arch} | {uploaded.name}",
+                               labels=lbl if has_labels else None)
         st.success("✅ Open3D window closed.")
 
 elif not uploaded:

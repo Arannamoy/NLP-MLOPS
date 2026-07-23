@@ -1,12 +1,16 @@
-# python inference_gradio.py   →  opens http://127.0.0.1:7860
+# python 021_inferenct_gradio.py   →  opens http://127.0.0.1:7860
 # ─────────────────────────────────────────────────────────────────────────────
-# Gradio UI for PTv2 point-cloud segmentation.
+# Gradio UI for point-cloud segmentation.
 # Contains NO inference logic of its own — everything is imported from
-# inference_standalone.py, the verified single source of truth.
+# inference.py, the shared, verified multi-architecture code path.
 # Gradio hands uploads over as real file paths, so the standalone
 # path-based pipeline is used directly, byte-for-byte.
 #
-# Requirement: inference_standalone.py in the same folder.
+# SYNCED with the multi-architecture inference.py (supports ptv2, kpconv,
+# randlanet, spt, pointnet2, pointnext — pick the architecture in the UI
+# that matches the checkpoint path you provide).
+#
+# Requirement: inference.py in the same folder.
 # ─────────────────────────────────────────────────────────────────────────────
 import os, time, hashlib, datetime
 import numpy as np
@@ -15,54 +19,50 @@ import plotly.graph_objects as go
 
 import multiprocessing as _mp
 
-from inference_standalone import (
-    MODEL_PATH, TARGET_CLASS, NUM_CLASSES,
-    load_model, predict_full_cloud,
+from inference import (
+    TARGET_CLASS,
+    ARCH_BUILDERS,
+    load_model,
+    predict_full_cloud,
+    visualize_segmentation,
 )
+
+DEFAULT_MODEL_PATH = ("checkpoints/PointCloudDataset_SlidingWindow_9_channel/"
+                      "PointTransformerV2_best.pth")
+
 
 # ── Open3D window in a SEPARATE PROCESS ──────────────────────────────────────
 # Gradio callbacks run in worker threads; Open3D/GLFW requires a main thread,
 # so calling draw_geometries directly from a callback hangs or crashes.
 # A child process gets its own main thread → window opens instantly and the
 # Plotly output renders in parallel, without blocking the UI.
-def _open3d_window(pts, preds, title):
-    import numpy as np, open3d as o3d
-    colors = np.zeros((len(pts), 3), dtype=np.float64)
-    colors[preds == TARGET_CLASS] = [0.0, 0.8, 0.0]
-    colors[preds != TARGET_CLASS] = [0.8, 0.0, 0.0]
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector((pts - pts.mean(axis=0)).astype(np.float64))
-    pcd.colors = o3d.utility.Vector3dVector(colors)
-    span = float((pts.max(0) - pts.min(0)).max()) * 0.5
-    axes = o3d.geometry.TriangleMesh.create_coordinate_frame(size=span)
-    n_t = int((preds == TARGET_CLASS).sum())
-    o3d.visualization.draw_geometries(
-        [pcd, axes],
-        window_name=f"{title} | green(target)={n_t:,} "
-                    f"({n_t / max(len(preds), 1) * 100:.1f}%) | "
-                    f"red(others)={len(preds) - n_t:,}",
-        width=1280, height=800)
+def _open3d_window(pts, preds, title, labels):
+    visualize_segmentation(pts, preds, title=title, labels=labels)
 
-def show_open3d_async(pts, preds, title):
+def show_open3d_async(pts, preds, title, labels):
     ctx = _mp.get_context("fork" if hasattr(_mp, "get_context") and
                           "fork" in _mp.get_all_start_methods() else "spawn")
-    p = ctx.Process(target=_open3d_window, args=(pts, preds, title), daemon=True)
+    p = ctx.Process(target=_open3d_window, args=(pts, preds, title, labels), daemon=True)
     p.start()          # do NOT join — window lives independently of the UI
 
-# ── Model cache keyed on file-content hash (auto-reload when best.pth changes) ──
-_MODEL_CACHE = {"sha": None, "model": None, "n_pts": None}
+
+# ── Model cache keyed on (file-content hash, architecture) ───────────────────
+_MODEL_CACHE = {"sha": None, "arch": None, "model": None, "n_pts": None,
+               "in_ch": None, "nc": None, "flags": None}
 
 def _file_sha(path):
     return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
-def get_model():
-    if not os.path.exists(MODEL_PATH):
-        raise gr.Error(f"Model file not found: {MODEL_PATH}")
-    sha = _file_sha(MODEL_PATH)
-    if _MODEL_CACHE["sha"] != sha:                 # new/changed file → reload
-        model, n_pts = load_model(MODEL_PATH)
-        _MODEL_CACHE.update(sha=sha, model=model, n_pts=n_pts)
-    return _MODEL_CACHE["model"], _MODEL_CACHE["n_pts"], sha
+def get_model(model_path, arch):
+    if not os.path.exists(model_path):
+        raise gr.Error(f"Model file not found: {model_path}")
+    sha = _file_sha(model_path)
+    if _MODEL_CACHE["sha"] != sha or _MODEL_CACHE["arch"] != arch:
+        model, n_pts, in_ch, nc, flags = load_model(model_path, arch)
+        _MODEL_CACHE.update(sha=sha, arch=arch, model=model, n_pts=n_pts,
+                            in_ch=in_ch, nc=nc, flags=flags)
+    return (_MODEL_CACHE["model"], _MODEL_CACHE["n_pts"], _MODEL_CACHE["in_ch"],
+           _MODEL_CACHE["nc"], _MODEL_CACHE["flags"], sha)
 
 
 # ── Plotly 3D figure (display only) ──────────────────────────────────────────
@@ -101,23 +101,24 @@ def make_figure(pts, preds, max_pts, pt_size):
 
 
 # ── Main callback ─────────────────────────────────────────────────────────────
-def run_segmentation(las_file, max_pts, pt_size, open3d_window):
+def run_segmentation(las_file, model_path, arch, max_pts, pt_size, open3d_window):
     if las_file is None:
         raise gr.Error("Upload a .las / .laz file first.")
     las_path = las_file if isinstance(las_file, str) else las_file.name
 
-    model, n_pts, model_sha = get_model()
-    mt = datetime.datetime.fromtimestamp(os.path.getmtime(MODEL_PATH))
+    model, n_pts, in_ch, nc, flags, model_sha = get_model(model_path, arch)
+    mt = datetime.datetime.fromtimestamp(os.path.getmtime(model_path))
     fingerprint = (
-        f"🔑 **Model** `{os.path.abspath(MODEL_PATH)}` | sha256 "
+        f"🔑 **Model** `{os.path.abspath(model_path)}` | arch `{arch}` | sha256 "
         f"`{model_sha[:12]}` | modified {mt:%Y-%m-%d %H:%M} | "
-        f"chunk size {n_pts:,}\n\n"
+        f"in_channels={in_ch} | chunk size {n_pts:,}\n\n"
         f"📄 **File** `{os.path.basename(las_path)}` | sha256 "
-        f"`{_file_sha(las_path)[:12]}`"
+        f"`{_file_sha(las_path)[:12]}`\n\n"
+        f"Channel flags: `{flags}`"
     )
 
     t0 = time.time()
-    pts, preds, lbl = predict_full_cloud(model, las_path, n_pts)   # shared code
+    pts, preds, lbl = predict_full_cloud(model, las_path, n_pts, in_ch, flags)
     dt = time.time() - t0
 
     n_tot = len(pts)
@@ -129,20 +130,23 @@ def run_segmentation(las_file, max_pts, pt_size, open3d_window):
         f"{n_tgt / max(n_tot, 1) * 100:.2f}% | {dt:.1f}s |"
     )
 
-    # exact per-file mIoU when the file carries GT labels
-    if np.unique(lbl).size > 1:
-        ious = []
-        for c in range(NUM_CLASSES):
-            tp = int(((lbl == c) & (preds == c)).sum())
-            fp = int(((lbl != c) & (preds == c)).sum())
-            fn = int(((lbl == c) & (preds != c)).sum())
-            if tp + fp + fn:
-                ious.append(tp / (tp + fp + fn))
-        stats += f"\n\n📏 GT labels found → **per-file mIoU = {np.mean(ious):.4f}**"
+    # target-class IoU/Dice/Precision/Recall when the file carries GT labels
+    has_labels = lbl.any() or (lbl == 0).sum() < len(lbl)
+    if has_labels:
+        tp = int(((lbl == TARGET_CLASS) & (preds == TARGET_CLASS)).sum())
+        fp = int(((lbl != TARGET_CLASS) & (preds == TARGET_CLASS)).sum())
+        fn = int(((lbl == TARGET_CLASS) & (preds != TARGET_CLASS)).sum())
+        iou  = tp / (tp + fp + fn) if (tp + fp + fn) > 0 else 0.0
+        dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        stats += (f"\n\n📏 GT labels found → **target-class IoU = {iou:.4f}**  |  "
+                 f"Dice = {dice:.4f}  |  Precision = {prec:.4f}  |  Recall = {rec:.4f}")
 
     if open3d_window:
         show_open3d_async(pts, preds,
-                          title=f"Segmentation | {os.path.basename(las_path)}")
+                          title=f"Segmentation | {arch} | {os.path.basename(las_path)}",
+                          labels=lbl if has_labels else None)
         stats += "\n\n🪟 Open3D window opened on your desktop (separate process)."
 
     fig = make_figure(pts, preds, max_pts, pt_size)
@@ -152,12 +156,18 @@ def run_segmentation(las_file, max_pts, pt_size, open3d_window):
 # ── UI ────────────────────────────────────────────────────────────────────────
 with gr.Blocks(title="Point Cloud Segmentation") as demo:
     gr.Markdown("# 🌲 Point Cloud Segmentation — Inference\n"
-                f"Model: `{MODEL_PATH}` | Target class: `{TARGET_CLASS}` | "
-                "Engine: `inference_standalone.py` (shared code path)")
+                f"Engine: `inference.py` (shared code path) | "
+                f"Target class: `{TARGET_CLASS}` | "
+                f"Architectures: {', '.join(ARCH_BUILDERS.keys())}")
 
     with gr.Row():
         las_in = gr.File(label="Upload .las / .laz", file_types=[".las", ".laz"])
         with gr.Column():
+            arch_dd = gr.Dropdown(choices=list(ARCH_BUILDERS.keys()),
+                                  value=list(ARCH_BUILDERS.keys())[0],
+                                  label="Architecture")
+            model_path_tb = gr.Textbox(value=DEFAULT_MODEL_PATH,
+                                       label="Checkpoint path")
             max_pts = gr.Slider(20_000, 300_000, value=100_000, step=10_000,
                                 label="Max display points")
             pt_size = gr.Slider(1, 6, value=2, step=1, label="Point size")
@@ -171,7 +181,7 @@ with gr.Blocks(title="Point Cloud Segmentation") as demo:
     plot_out  = gr.Plot(label="3D Segmentation Result")
 
     run_btn.click(run_segmentation,
-                  inputs=[las_in, max_pts, pt_size, o3d_chk],
+                  inputs=[las_in, model_path_tb, arch_dd, max_pts, pt_size, o3d_chk],
                   outputs=[fp_out, stats_out, plot_out])
 
 if __name__ == "__main__":
