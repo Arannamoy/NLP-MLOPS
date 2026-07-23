@@ -923,9 +923,14 @@ def visualize_segmentation(points, predictions, title="Segmentation",
         tp = int(((labels == target_class) & (predictions == target_class)).sum())
         fp = int(((labels != target_class) & (predictions == target_class)).sum())
         fn = int(((labels == target_class) & (predictions != target_class)).sum())
+        tn = int(((labels != target_class) & (predictions != target_class)).sum())
         iou  = tp / (tp + fp + fn) if (tp + fp + fn) > 0 else 0.0
         dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
-        full_title += f"  |  IoU={iou:.4f}  Dice={dice:.4f}"
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        acc  = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
+        full_title += (f"  |  IoU={iou:.4f}  Dice={dice:.4f}  "
+                       f"Prec={prec:.4f}  Rec={rec:.4f}  Acc={acc:.4f}")
 
     print(full_title)
     o3d.visualization.draw_geometries([pcd, axes], window_name=full_title,
@@ -933,16 +938,16 @@ def visualize_segmentation(points, predictions, title="Segmentation",
 
 
 def report_iou(names, true_list, pred_list, target_class=TARGET_CLASS):
-    header = (f"{'File':<22}{'IoU':>7}{'Dice':>7}{'Prec':>7}{'Rec':>7}"
+    header = (f"{'File':<22}{'IoU':>7}{'Dice':>7}{'Prec':>7}{'Rec':>7}{'Acc':>7}"
              f"{'TP':>9}{'FP':>9}{'FN':>9}{'TN':>9}{'GT_Wood':>10}{'Pred_Wood':>11}")
     print(f"\n{'='*len(header)}")
     print(header)
     print('-'*len(header))
-    ious, dices, precs, recs = [], [], [], []
+    ious, dices, precs, recs, accs = [], [], [], [], []
     for name, true, pred in zip(names, true_list, pred_list):
         pred_wood = int((pred == target_class).sum())
         if true is None:
-            print(f"{name:<22}{'-':>7}{'-':>7}{'-':>7}{'-':>7}"
+            print(f"{name:<22}{'-':>7}{'-':>7}{'-':>7}{'-':>7}{'-':>7}"
                  f"{'-':>9}{'-':>9}{'-':>9}{'-':>9}{'-':>10}{pred_wood:>11,}")
             continue
         tp = int(((true == target_class) & (pred == target_class)).sum())
@@ -954,13 +959,15 @@ def report_iou(names, true_list, pred_list, target_class=TARGET_CLASS):
         dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
         prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        acc  = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
         ious.append(iou); dices.append(dice); precs.append(prec); recs.append(rec)
-        print(f"{name:<22}{iou:7.3f}{dice:7.3f}{prec:7.3f}{rec:7.3f}"
+        accs.append(acc)
+        print(f"{name:<22}{iou:7.3f}{dice:7.3f}{prec:7.3f}{rec:7.3f}{acc:7.3f}"
              f"{tp:9,}{fp:9,}{fn:9,}{tn:9,}{gt_wood:10,}{pred_wood:11,}")
     if ious:
         print('-'*len(header))
         print(f"{'MEAN':<22}{np.mean(ious):7.3f}{np.mean(dices):7.3f}"
-             f"{np.mean(precs):7.3f}{np.mean(recs):7.3f}")
+             f"{np.mean(precs):7.3f}{np.mean(recs):7.3f}{np.mean(accs):7.3f}")
     print('='*len(header))
 
 

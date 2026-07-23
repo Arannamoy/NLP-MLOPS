@@ -162,8 +162,10 @@ if uploaded and run_btn:
         dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
         prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        acc  = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
         st.info(f"📏 GT labels found → **target-class IoU = {iou:.4f}**  |  "
-               f"Dice = {dice:.4f}  |  Precision = {prec:.4f}  |  Recall = {rec:.4f}")
+               f"Dice = {dice:.4f}  |  Precision = {prec:.4f}  |  Recall = {rec:.4f}  |  "
+               f"Accuracy = {acc:.4f}")
         st.caption(f"TP={tp:,}  FP={fp:,}  FN={fn:,}  TN={tn:,}")
 
     # 5) visualize
